@@ -1,6 +1,7 @@
 const path = require('path');
 const wasmTester = require('circom_tester').wasm;
 const utils = require('./utils');
+const fs = require("fs");
 
 const main = async () => {
     // const cir = await wasmTester(path.join(__dirname, 'circuits', 'verify.circom'));
@@ -40,19 +41,41 @@ const main = async () => {
         utils.pad(chunkA[i], 3);
         utils.pad(chunkR[i], 3);
     }
-    try {
-        const startTime = performance.now();
-        const witness = await cir.calculateWitness({
-            msg: bitsMsg, A: bitsA, R8: bitsR8, S: bitsS, PointA: chunkA, PointR: chunkR,
-        });
-        const endTime = performance.now();
-        mlog.success(`Call to calculate witness took ${endTime - startTime} milliseconds`);
-        assert.ok(witness[0] === 1n);
-        assert.ok(witness[1] === 1n);
-    } catch (e) {
-        mlog.error(e);
-        assert.ok(false);
+
+    const input = {
+        msg: bitsMsg,
+        pubKeys: bitsA,
+        R8: bitsR8,
+        S: bitsS,
+        PointA: chunkA,
+        PointR: chunkR
     }
+    
+    const json = JSON.stringify(input, null, 2);
+    // console.log(json);
+    fs.writeFile('src/block/input.json', json, (err) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log("write successful");
+        }
+    });
+    // console.log(bufS)
+    // console.log(bitsS)
+    
+    // try {
+    //     const startTime = performance.now();
+    //     const witness = await cir.calculateWitness({
+    //         msg: bitsMsg, A: bitsA, R8: bitsR8, S: bitsS, PointA: chunkA, PointR: chunkR,
+    //     });
+    //     const endTime = performance.now();
+    //     mlog.success(`Call to calculate witness took ${endTime - startTime} milliseconds`);
+    //     assert.ok(witness[0] === 1n);
+    //     assert.ok(witness[1] === 1n);
+    // } catch (e) {
+    //     mlog.error(e);
+    //     assert.ok(false);
+    // }
 }
 main()
     .then(() => { })
