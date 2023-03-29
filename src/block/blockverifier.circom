@@ -13,7 +13,7 @@ template BlockVerifier(nBits) {
 
     var i;
     var j;
-    component v = SignatureVerifier2(nBits);
+    component v = SignatureVerifier(nBits);
     
     for(i = 0; i < nBits; i++) {
         v.msg[i] <== msg[i];

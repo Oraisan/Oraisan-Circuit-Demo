@@ -11,7 +11,7 @@ include "../node_modules/circomlib/circuits/gates.circom";
 
 
 template Ed25519Verifier(n) {
-  assert(n % 8 == 0);
+  
   
   signal input msg[n];
   
@@ -32,23 +32,9 @@ template Ed25519Verifier(n) {
     pMul1.S[i] <== S[i];
   }
 
-  component hash = Sha512(n+256+256);
-  for (i=0; i<256; i+=8) {
-    for(j=0; j<8; j++) {
-      hash.in[i+j] <== R8[i+(7-j)];
-      hash.in[256+i+j] <== A[i+(7-j)];
-    }
-  }
-
-  for (i=0; i<n; i+=8) {
-    for(j=0; j<8; j++) {
-      hash.in[512+i+j] <== msg[i+(7-j)];
-    }
-  }
-
-  component addRH = CalculateAddRH();
-  for( i = 0; i < 512; i++) {
-    addRH.hash[i] <== hash[i];
+  component addRH = CalculateAddRH(n);
+  for(i = 0; i < n; i ++) {
+    addRH.msg[i] <== msg[i];
   }
 
   for(i = 0; i < 256; i++) {
@@ -104,12 +90,14 @@ template CalculatePMul1() {
   }
 }
 
-template CalculateAddRH() {
+template CalculateAddRH(n) {
+  assert(n % 8 == 0);
+
+  signal input msg[n];
 
   signal input A[256];
   signal input R8[256];
   
-  signal input hash[512];
   signal input PointA[4][3];
   signal input PointR[4][3];
 
@@ -132,12 +120,24 @@ template CalculateAddRH() {
     compressR.out[i] === R8[i];
   }
 
-  
+  component hash = Sha512(n+256+256);
+  for (i=0; i<256; i+=8) {
+    for(j=0; j<8; j++) {
+      hash.in[i+j] <== R8[i+(7-j)];
+      hash.in[256+i+j] <== A[i+(7-j)];
+    }
+  }
+
+  for (i=0; i<n; i+=8) {
+    for(j=0; j<8; j++) {
+      hash.in[512+i+j] <== msg[i+(7-j)];
+    }
+  }
 
   component bitModulus = ModulusWith252c(512);
   for (i=0; i<512; i+=8) {
     for(j=0; j<8; j++) {
-      bitModulus.in[i+j] <== hash[i + (7-j)];
+      bitModulus.in[i+j] <== hash.out[i + (7-j)];
     }
   }
 
