@@ -4,7 +4,7 @@ const utils = require('./utils');
 const fs = require("fs");
 
 const main = async () => {
-    // const cir = await wasmTester(path.join(__dirname, 'circuits', 'verify.circom'));
+    const cir = await wasmTester(path.join(__dirname, '../src/block/blockverifier.circom'));
     const pointA = [
         19609600535639426967582330360073854330664420980290928614443703354937550235772n,
         4819101209465356224883271557990864103528016550052741516590013689083114432765n,
@@ -17,10 +17,11 @@ const main = async () => {
         1n,
         29423111549617446375779108146631000784035658644093037228114776583127667239194n,
     ];
-    const A = BigInt("0xFD284E309E23A18641A8F545B43D3EB24539F65061F38B80C8B92678BE83A70A");
+    const A = BigInt("0xfd284e309e23a18641a8f545b43d3eb24539f65061f38b80c8b92678be83a70a");
     const msg = BigInt("0x6e080211c5c69d000000000022480a20ddb010fecda643efb6e7f0fbcbb0a4ab7f23173f865b40edf47139a3627e12001224080112201c426cdc8371b36afe91a1818812087903b35c6fc6ef998d19ff2dcf6efa00a52a0c08e48bc49f0610b389b6f50132094f726169636861696e");
     const R8 = BigInt("0x1dc724b254a6734c1e470f20339333011e429576b3f5016c5c857bff1abfd189");
     const S = BigInt("0xcc2ef5452e54a95e9bf0f861acbfd4f8bfcc75260cb5bdc7d06d654481a76104");
+    // console.log(A)
     const bufMsg = utils.bigIntToLEBuffer(msg);
     const bufR8 = utils.bigIntToLEBuffer(R8);
     const bufS = utils.bigIntToLEBuffer(S);
@@ -42,6 +43,12 @@ const main = async () => {
         utils.pad(chunkR[i], 3);
     }
 
+    console.log(bitsMsg.length)
+    console.log(bitsA.length)
+    console.log(bitsR8.length)
+    console.log(bitsS.length)
+    console.log(chunkA.length)
+    console.log(chunkR.length)
     // console.log(bufR8)
     const input = {
         msg: bitsMsg,
@@ -64,19 +71,19 @@ const main = async () => {
     // console.log(bufS)
     // console.log(bitsS)
     
-    // try {
-    //     const startTime = performance.now();
-    //     const witness = await cir.calculateWitness({
-    //         msg: bitsMsg, A: bitsA, R8: bitsR8, S: bitsS, PointA: chunkA, PointR: chunkR,
-    //     });
-    //     const endTime = performance.now();
-    //     mlog.success(`Call to calculate witness took ${endTime - startTime} milliseconds`);
-    //     assert.ok(witness[0] === 1n);
-    //     assert.ok(witness[1] === 1n);
-    // } catch (e) {
-    //     mlog.error(e);
-    //     assert.ok(false);
-    // }
+    try {
+        const startTime = performance.now();
+        const witness = await cir.calculateWitness({
+            msg: bitsMsg, A: bitsA, R8: bitsR8, S: bitsS, PointA: chunkA, PointR: chunkR,
+        });
+        const endTime = performance.now();
+        mlog.success(`Call to calculate witness took ${endTime - startTime} milliseconds`);
+        assert.ok(witness[0] === 1n);
+        assert.ok(witness[1] === 1n);
+    } catch (e) {
+        mlog.error(e);
+        assert.ok(false);
+    }
 }
 main()
     .then(() => { })
