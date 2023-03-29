@@ -52,6 +52,7 @@ function getBitArrayFromByteArray(byteArray) {
         binaryArray.push(...binaryString.split('').map(bit => parseInt(bit)));
     }
     return binaryArray
+    
 }
 const main = async () => {
     eddsa = await buildEddsa();
