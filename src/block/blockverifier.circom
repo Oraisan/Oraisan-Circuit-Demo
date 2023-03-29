@@ -6,7 +6,8 @@ template BlockVerifier(nBits) {
     signal input msg[nBits];
     
     signal input pubKeys[256];
-    signal input sigs[512];
+    signal input R8[256];
+    signal input S[255];
 
     signal input PointA[4][3];
     signal input PointR[4][3];
@@ -21,11 +22,11 @@ template BlockVerifier(nBits) {
 
     for(i = 0; i < 256; i++) {
         v.pubKeys[i] <== pubKeys[i];
-        v.R8[i] <== sigs[i];
+        v.R8[i] <== R8[i];
     }
 
     for(i = 0; i < 255; i++) {
-        v.S[i] <== sigs[i+257];
+        v.S[i] <== S[i];
     }
 
     for(i = 0; i < 4; i++) {
@@ -36,4 +37,4 @@ template BlockVerifier(nBits) {
     }
 }
 
-component main{public[pubKeys]} = BlockVerifier(888);
+component main{public[pubKeys]} = BlockVerifier(16);
