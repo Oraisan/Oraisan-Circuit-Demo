@@ -1,16 +1,17 @@
 pragma circom 2.0.0;
 
-include "../scalarmul.circom";
-include "../modulus.circom";
-include "../point-addition.circom";
-include "../pointcompress.circom";
+include "../../scalarmul.circom";
+include "../../modulus.circom";
+include "../../point-addition.circom";
+include "../../pointcompress.circom";
 
-include "../../node_modules/@electron-labs/sha512/circuits/sha512/sha512.circom";
-include "../../node_modules/circomlib/circuits/comparators.circom";
-include "../../node_modules/circomlib/circuits/gates.circom";
+include "../../../node_modules/@electron-labs/sha512/circuits/sha512/sha512.circom";
+include "../../../node_modules/circomlib/circuits/comparators.circom";
+include "../../../node_modules/circomlib/circuits/gates.circom";
+
 
 template Ed25519Verifier(n) {
-  assert(n % 8 == 0);
+  
   
   signal input msg[n];
   
@@ -23,11 +24,84 @@ template Ed25519Verifier(n) {
 
   signal output out;
 
+  var i;
+  var j;
+
+  component pMul1 = CalculatePMul1();
+  for(i = 0; i < 255; i++) {
+    pMul1.S[i] <== S[i];
+  }
+
+  component addRH = CalculateAddRH(n);
+  for(i = 0; i < n; i ++) {
+    addRH.msg[i] <== msg[i];
+  }
+
+  for(i = 0; i < 256; i++) {
+    addRH.A[i] <== A[i];
+    addRH.R8[i] <== R8[i];
+  }
+
+  for(i = 0; i < 4; i++) {
+    for(j = 0; j < 3; j++) {
+      addRH.PointA[i][j] <== PointA[i][j];
+      addRH.PointR[i][j] <== PointR[i][j];
+    }
+  }
+
+  component equal = PointEqual();
+  for(i=0; i<3; i++) {
+    for(j=0; j<3; j++) {
+      equal.p[i][j] <== pMul1.sP[i][j];
+      equal.q[i][j] <== addRH.R[i][j];
+    }
+  }
+
+  out <== equal.out;
+}
+
+template CalculatePMul1() {
+  signal input S[255];
+  signal output sP[4][3];
+
   var G[4][3] = [[6836562328990639286768922, 21231440843933962135602345, 10097852978535018773096760],
                  [7737125245533626718119512, 23211375736600880154358579, 30948500982134506872478105],
                  [1, 0, 0],
                  [20943500354259764865654179, 24722277920680796426601402, 31289658119428895172835987]
                 ];
+
+  var i;
+  var j;
+  // point multiplication s, G
+  component pMul1 = ScalarMul();
+  for(i=0; i<255; i++) {
+    pMul1.s[i] <== S[i];
+  }
+  for (i=0; i<4; i++) {
+    for (j=0; j<3; j++) {
+      pMul1.P[i][j] <== G[i][j];
+    }
+  }
+
+  for (i = 0; i < 4; i++ ) {
+    for(j = 0; j < 3; j++) {
+      sP[i][j] <== pMul1.sP[i][j];
+    }
+  }
+}
+
+template CalculateAddRH(n) {
+  assert(n % 8 == 0);
+
+  signal input msg[n];
+
+  signal input A[256];
+  signal input R8[256];
+  
+  signal input PointA[4][3];
+  signal input PointR[4][3];
+
+  signal output R[4][3];
 
   var i;
   var j;
@@ -53,6 +127,7 @@ template Ed25519Verifier(n) {
       hash.in[256+i+j] <== A[i+(7-j)];
     }
   }
+
   for (i=0; i<n; i+=8) {
     for(j=0; j<8; j++) {
       hash.in[512+i+j] <== msg[i+(7-j)];
@@ -66,18 +141,6 @@ template Ed25519Verifier(n) {
     }
   }
 
-  // point multiplication s, G
-  component pMul1 = ScalarMul();
-  for(i=0; i<255; i++) {
-    pMul1.s[i] <== S[i];
-  }
-  for (i=0; i<4; i++) {
-    for (j=0; j<3; j++) {
-      pMul1.P[i][j] <== G[i][j];
-    }
-  }
-
-  // point multiplication h, A
   component pMul2 = ScalarMul();
   for (i=0; i<253; i++) {
     pMul2.s[i] <== bitModulus.out[i];
@@ -99,15 +162,11 @@ template Ed25519Verifier(n) {
     }
   }
 
-  component equal = PointEqual();
-  for(i=0; i<3; i++) {
-    for(j=0; j<3; j++) {
-      equal.p[i][j] <== pMul1.sP[i][j];
-      equal.q[i][j] <== addRH.R[i][j];
+  for ( i = 0; i < 4; i++) {
+    for(j = 0; j < 3; j++) {
+      R[i][j] <== addRH.R[i][j];
     }
   }
-
-  out <== equal.out;
 }
 
 template PointEqual() {
@@ -194,4 +253,4 @@ template PointEqual() {
   out <== and2[1].out;
 }
 
-component main{public[msg, A, R8, S]} = Ed25519Verifier(888);
+component main{public[msg]} = CalculateAddRH(888);

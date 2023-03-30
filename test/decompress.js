@@ -2,8 +2,11 @@ const path = require('path');
 const wasmTester = require('circom_tester').wasm;
 const utils = require('./utils');
 const fs = require("fs");
+const assert = require('assert');
 
 const main = async () => {
+    // const cir = await wasmTester(path.join(__dirname, '../electron-labs/test/compress/pointcompress_test.circom'));
+    const cir = await wasmTester(path.join(__dirname, '../electron-labs/test/verify/verifier_test.circom'));
     // const cir = await wasmTester(path.join(__dirname, '../electron-labs/test/verifier_test.circom'));
     const pointA = [
         19609600535639426967582330360073854330664420980290928614443703354937550235772n,
@@ -55,48 +58,37 @@ const main = async () => {
         utils.pad(chunkG[i], 3);
     }
 
-    console.log(bitsMsg.length)
-    console.log(bitsA.length)
-    console.log(bitsR8.length)
-    console.log(bitsS.length)
-    console.log(chunkA.length)
-    console.log(chunkR.length)
-    console.log(chunkG)
-    // console.log(bufR8)
     const input = {
         msg: bitsMsg,
-        pubKeys: bitsA,
+        A: bitsA,
         R8: bitsR8,
-        S: bitsS,
         PointA: chunkA,
-        PointR: chunkR
+        PointR: chunkR,
     }
-    
-    const json = JSON.stringify(input, null, 2);
-    // console.log(json);
-    fs.writeFile('src/block/input.json', json, (err) => {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log("write successful");
-        }
-    });
-    // console.log(bufS)
-    // console.log(bitsS)
-    
-    // try {
-    //     const startTime = performance.now();
-    //     const witness = await cir.calculateWitness({
-    //         msg: bitsMsg, A: bitsA, R8: bitsR8, S: bitsS, PointA: chunkA, PointR: chunkR,
-    //     });
-    //     const endTime = performance.now();
-    //     mlog.success(`Call to calculate witness took ${endTime - startTime} milliseconds`);
-    //     assert.ok(witness[0] === 1n);
-    //     assert.ok(witness[1] === 1n);
-    // } catch (e) {
-    //     mlog.error(e);
-    //     assert.ok(false);
-    // }
+
+    // const json = JSON.stringify(input, null, 2);
+    // // console.log(json);
+    // fs.writeFile('electron-labs/test/compress/input.json', json, (err) => {
+    //     if (err) {
+    //         console.log(err);
+    //     } else {
+    //         console.log("write successful");
+    //     }
+    // });
+
+    const res = utils.point_compress(pointA);
+    console.log(res)
+    try {
+        const witness = await cir.calculateWitness({
+            input
+        });
+        // const witness = await cir.calculateWitness({
+        //     P: chunkA
+        // });
+        // assert.ok(witness.slice(1, 257).every((u, i) => u === res[i]));
+    } catch (e) {
+        console.log(e)
+    }
 }
 main()
     .then(() => { })
