@@ -5,8 +5,8 @@ const fs = require("fs");
 const assert = require('assert');
 
 const main = async () => {
-    const path = "electron-labs/test/verify"
-    // const cir = await wasmTester(path.join(__dirname, '../electron-labs/test/compress/pointcompress_test.circom'));
+    const p = "electron-labs/test/verify"
+    const cir = await wasmTester(path.join(__dirname, '../electron-labs/test/compress/pointcompress_test.circom'));
     // const cir = await wasmTester(path.join(__dirname, path +'/verifier_test.circom'));
     // const cir = await wasmTester(path.join(__dirname, '../electron-labs/test/verifier_test.circom'));
     const pointA = [
@@ -27,19 +27,19 @@ const main = async () => {
         1n,
         46827403850823179245072216630277197565144205554125654976674165829533817101731n
     ]
-    const A = BigInt("0x0aa783be7826b9c8808bf36150f63945b23e3db445f5a84186a1239e304e28fd");
+    const A = BigInt("0xFD284E309E23A18641A8F545B43D3EB24539F65061F38B80C8B92678BE83A70A");
     const msg = BigInt("0x6e080211c5c69d000000000022480a20ddb010fecda643efb6e7f0fbcbb0a4ab7f23173f865b40edf47139a3627e12001224080112201c426cdc8371b36afe91a1818812087903b35c6fc6ef998d19ff2dcf6efa00a52a0c08e48bc49f0610b389b6f50132094f726169636861696e");
     const R8 = BigInt("0x1dc724b254a6734c1e470f20339333011e429576b3f5016c5c857bff1abfd189");
     const S = BigInt("0xcc2ef5452e54a95e9bf0f861acbfd4f8bfcc75260cb5bdc7d06d654481a76104");
     console.log(A)
-    console.log("msg", msg)
-    console.log("r8", R8)
-    console.log("S", S)
-    const bufMsg = utils.bigIntToLEBuffer(msg);
-    const bufR8 = utils.bigIntToLEBuffer(R8);
-    const bufS = utils.bigIntToLEBuffer(S);
-    const bufA = utils.bigIntToLEBuffer(A);
-    const bitsMsg = utils.buffer2bits(bufMsg, 888);
+    console.log("msg", msg.toString("16"))
+    console.log("r8", R8.toString("16"))
+    console.log("S", S.toString("16"))
+    const bufMsg = utils.bigIntToLEBuffer(msg).reverse();
+    const bufR8 = utils.bigIntToLEBuffer(R8).reverse();
+    const bufS = utils.bigIntToLEBuffer(S).reverse();
+    const bufA = utils.bigIntToLEBuffer(A).reverse();
+    const bitsMsg = utils.buffer2bits(bufMsg, 888).reverse();
     const bitsR8 = utils.pad(utils.buffer2bits(bufR8), 256);
     const bitsS = utils.pad(utils.buffer2bits(bufS), 255).slice(0, 255);
     const bitsA = utils.pad(utils.buffer2bits(bufA), 256);
@@ -70,7 +70,7 @@ const main = async () => {
 
     const json = JSON.stringify(input, null, 2);
     // console.log(json);
-    fs.writeFile(path + '/input.json', json, (err) => {
+    fs.writeFile(p + '/input.json', json, (err) => {
         if (err) {
             console.log(err);
         } else {
@@ -78,19 +78,18 @@ const main = async () => {
         }
     });
 
-//     const res = utils.point_compress(pointA);
-//     console.log(res)
-//     try {
-//         const witness = await cir.calculateWitness({
-//             input
-//         });
-//         // const witness = await cir.calculateWitness({
-//         //     P: chunkA
-//         // });
-//         // assert.ok(witness.slice(1, 257).every((u, i) => u === res[i]));
-//     } catch (e) {
-//         console.log(e)
-//     }
+    try {
+        const witness = await cir.calculateWitness({
+            P: chunkR,
+            A: bitsR8
+        });
+        // const witness = await cir.calculateWitness({
+        //     P: chunkA
+        // });
+        // assert.ok(witness.slice(1, 257).every((u, i) => u === res[i]));
+    } catch (e) {
+        console.log(e)
+    }
  }
 main()
     .then(() => { })

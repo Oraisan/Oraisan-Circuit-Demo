@@ -55,7 +55,7 @@ template PointCompress(){
 
     for(i = 0; i < 256; i++) {
         log(A[i], out[i]);
-        // out[i] === A[i];
+        out[i] === A[i];
     }
 }
 

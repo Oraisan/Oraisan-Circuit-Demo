@@ -35,6 +35,10 @@ function bigIntToLEBuffer(x) {
     return Buffer.from(convertToEvenLength(x.toString(16)), 'hex').reverse()
 }
 
+function bigIntToBEBuffer(x) {
+    return Buffer.from(convertToEvenLength(x.toString(16)), 'hex').reverse()
+}
+
 function pad(x, n) {
     var total = n - x.length;
     for (var i = 0; i < total; i++) {
@@ -125,6 +129,7 @@ module.exports = {
     convertToEvenLength,
     normalize,
     bigIntToLEBuffer,
+    bigIntToBEBuffer,
     pad,
     chunkBigInt,
     bitsToBigInt,
