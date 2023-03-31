@@ -5,7 +5,7 @@ npm i
 
 download powersOfTau28_hez_final_22.ptau from https://github.com/iden3/snarkjs or https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_22.ptau 
 
-then save this ptau file to folder ./ptau
+then create folder ptau (same level with folder src) and save this ptau file to folder.
 
 ```
 cd src/block
