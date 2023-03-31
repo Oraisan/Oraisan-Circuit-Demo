@@ -37,4 +37,4 @@ template BlockVerifier(nBits) {
     }
 }
 
-component main{public[pubKeys]} = BlockVerifier(16);
+component main{public[pubKeys]} = BlockVerifier(888);
