@@ -2,4 +2,4 @@
 pragma circom 2.0.0;
 include "../../src/libs/utils/messageheaderencode.circom";
 
-component main = EncodeBlockID(34, 10, 18, 18, 8);
+component main{public[height]} = MessageHeaderEncodeToBytes(111);
