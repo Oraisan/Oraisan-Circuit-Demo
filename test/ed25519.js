@@ -3,6 +3,19 @@ const wasmTester = require('circom_tester').wasm;
 const utils = require('./utils');
 const fs = require("fs");
 
+function binaryArrayToBytesArray(binaryArray) {
+    // Convert the binary array to a string of binary digits
+    const binaryString = binaryArray.join("");
+
+    // Split the binary string into an array of 8-bit substrings
+    const byteStrings = binaryString.match(/.{1,8}/g);
+    // Convert each 8-bit substring to a byte value
+    const byteArray = byteStrings.map(byteString => {
+        return parseInt(byteString.split("").reverse().join(""), 2);
+    });
+    return byteArray;
+}
+
 const main = async () => {
     // const cir = await wasmTester(path.join(__dirname, '../electron-labs/test/verifier_test.circom'));
     const pointA = [
@@ -55,32 +68,33 @@ const main = async () => {
         utils.pad(chunkG[i], 3);
     }
 
-    console.log(bitsMsg.length)
-    console.log(bitsA.length)
-    console.log(bitsR8.length)
-    console.log(bitsS.length)
-    console.log(chunkA.length)
-    console.log(chunkR.length)
-    console.log(chunkG)
+    // console.log(bitsMsg.length)
+    // console.log(bitsA.length)
+    // console.log(bitsR8.length)
+    // console.log(bitsS.length)
+    // console.log(chunkA.length)
+    // console.log(chunkR.length)
+    // console.log(chunkG)
     // console.log(bufR8)
     const input = {
-        msg: bitsMsg,
-        pubKeys: bitsA,
-        R8: bitsR8,
-        S: bitsS,
+        msg:  binaryArrayToBytesArray(bitsMsg),
+        pubKeys: binaryArrayToBytesArray(bitsA),
+        R8: binaryArrayToBytesArray(bitsR8),
+        S: binaryArrayToBytesArray(bitsS),
         PointA: chunkA,
         PointR: chunkR
     }
     
-    const json = JSON.stringify(input, null, 2);
-    // console.log(json);
-    fs.writeFile('src/block/input.json', json, (err) => {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log("write successful");
-        }
-    });
+    console.log(input);
+    // const json = JSON.stringify(input, null, 2);
+    // // console.log(json);
+    // fs.writeFile('src/block/input.json', json, (err) => {
+    //     if (err) {
+    //         console.log(err);
+    //     } else {
+    //         console.log("write successful");
+    //     }
+    // });
     // console.log(bufS)
     // console.log(bitsS)
     
