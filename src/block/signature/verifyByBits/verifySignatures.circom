@@ -73,4 +73,4 @@ include "../../libs/validators/signaturesverifier.circom";
 // }
 
 
-component main{public[pubKeys]} = SignatureVerifierByBytes(111);
+component main{public[pubKeys]} = SignatureVerifier(888);

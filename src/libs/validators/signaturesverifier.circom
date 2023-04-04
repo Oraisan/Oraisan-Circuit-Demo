@@ -110,3 +110,102 @@ template SignatureVerifierByBytes(nBytes) {
 
     v.out === 1;
 }
+
+template AddRHCalculation(nBytes) {
+    signal input pubKeys[32];
+    signal input R8[32];
+
+    signal input msg[nBytes];
+
+    signal input PointA[4][3];
+    signal input PointR[4][3];
+
+    signal output addRH[4][3];
+    var i;
+    var j;
+
+    component msg2Bits[nBytes];
+    for(i = 0; i < nBytes; i++) {
+        msg2Bits[i] = BytesToBits(8);
+        msg2Bits[i].in <== msg[i];
+    }
+
+    component pb2Bits[32];
+    for(i = 0; i < 32; i++) {
+        pb2Bits[i] = BytesToBits(8);
+        pb2Bits[i].in <== pubKeys[i];
+    }
+
+    component r8ToBits[32];
+    for(i = 0; i < 32; i++) {
+        r8ToBits[i] = BytesToBits(8);
+        r8ToBits[i].in <== R8[i];
+    }
+
+    component R = CalculateAddRH(8 * nBytes);
+
+    for(i = 0; i < nBytes; i++) {
+        for(j = 0; j < 8; j++) {
+            R.msg[i * 8 + j] <== msg2Bits[i].out[j];
+        }
+    }
+
+    for(i = 0; i < 32; i++) {
+        for(j = 0; j < 8; j++) {
+            R.A[i * 8 + j] <== pb2Bits[i].out[j];
+            R.R8[i * 8 + j] <== r8ToBits[i].out[j];
+        }
+    }
+
+    for(i = 0; i < 4; i++) {
+        for(j = 0; j < 3; j++) {
+            R.PointA[i][j] <== PointA[i][j];
+            R.PointR[i][j] <== PointR[i][j];
+        }
+    }
+
+    for(i = 0; i < 4; i++) {
+        for(j = 0; j < 3; j++) {
+            addRH[i][j] <== R.R[i][j];
+        }
+    }
+    
+}
+
+template PMul1Verifier() {
+    signal input S[32];
+    signal output PMul1[4][3];
+    // signal input addRH[4][3];
+
+    var i;
+    var j;
+
+    component S2Bits[32];
+    for(i = 0; i < 32; i++) {
+        S2Bits[i] = BytesToBits(8);
+        S2Bits[i].in <== S[i];
+    }
+
+    component pM = CalculatePMul1();
+
+    for(i = 0; i < 31; i++) {
+        for(j = 0; j < 8; j++) {
+            pM.S[i * 8 + j] <== S2Bits[i].out[j];
+        }
+    }
+
+    for(i = 0; i < 7; i++) {
+        pM.S[248 + i] <== S2Bits[31].out[i];
+    }
+
+
+    // component equal = PointEqual();
+    for(i=0; i<4; i++) {
+         for(j=0; j<3; j++) {
+            PMul1[i][j] <== pM.sP[i][j];
+        }
+    }
+
+    // equal.out === 1;
+    
+}

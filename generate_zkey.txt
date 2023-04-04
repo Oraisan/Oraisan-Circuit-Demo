@@ -1,0 +1,4 @@
+
+curl -o ./ptau/powersOfTau28_hez_final_22.ptau https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_22.ptau
+
+snarkjs g16s ./src/block/signature/*.r1cs ./ptau/powersOfTau28_hez_final_22.ptau ./src/block/signature/circuit_final.zkey

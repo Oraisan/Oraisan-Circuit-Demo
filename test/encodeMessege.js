@@ -85,18 +85,19 @@ const main = async () => {
     let chainID = getBitsArrayFromHex(byteToHexString([79, 114, 97, 105, 99, 104, 97, 105, 110]));
     let message = [110, 8, 2, 17, 197, 198, 157, 0, 0, 0, 0, 0, 34, 72, 10, 32, 221, 176, 16, 254, 205, 166, 67, 239, 182, 231, 240, 251, 203, 176, 164, 171, 127, 35, 23, 63, 134, 91, 64, 237, 244, 113, 57, 163, 98, 126, 18, 0, 18, 36, 8, 1, 18, 32, 28, 66, 108, 220, 131, 113, 179, 106, 254, 145, 161, 129, 136, 18, 8, 121, 3, 179, 92, 111, 198, 239, 153, 141, 25, 255, 45, 207, 110, 250, 0, 165, 42, 12, 8, 228, 139, 196, 159, 6, 16, 179, 137, 182, 245, 1, 50, 9, 79, 114, 97, 105, 99, 104, 97, 105, 110];
     const input = {
+        fnc: Array.from({length: 40}, () => 1),
         height: height,
         blockHash: blockHash,
         partsTotal: partsTotal,
         partsHash: partsHash,
-        seconds: seconds,
-        nanos: nanos,
+        seconds: Array.from({length: 40}, () => seconds),
+        nanos: Array.from({length: 40}, () => nanos),
         // chainID: chainID,
-        message: message
+        msg: Array.from({length: 40}, () => message)
     }
     
     const json = JSON.stringify(input, null, 2);
-    // console.log(json);
+    console.log(input.msg[0].length);
     fs.writeFile(p + '/input.json', json, (err) => {
         if (err) {
             console.log(err);
@@ -107,14 +108,15 @@ const main = async () => {
 
     try {
         const witness = await cir.calculateWitness({
-            height: height,
-            blockHash: blockHash,
-            partsTotal: partsTotal,
-            partsHash: partsHash,
-            seconds: seconds,
-            nanos: nanos,
-            // chainID: chainID,
-            message: message
+            fnc: input.fnc,
+            height: input.height,
+            blockHash: input.blockHash,
+            partsTotal: input.partsTotal,
+            partsHash: input.partsHash,
+            seconds: input.seconds,
+            nanos: input.nanos,
+            // chainID: input.chainID,
+            msg: input.msg
         });
         // const witness = await cir.calculateWitness({
         //     P: chunkA

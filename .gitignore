@@ -1,5 +1,6 @@
 node_modules
 *_js
+*.zkey
 *.r1cs
 *.sym
 ptau
