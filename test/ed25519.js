@@ -30,12 +30,6 @@ const main = async () => {
         1n,
         29423111549617446375779108146631000784035658644093037228114776583127667239194n,
     ];
-    const pointG = [
-        15112221349535400772501151409588531511454012693041857206046113283949847762202n,
-        46316835694926478169428394003475163141307993866256225615783033603165251855960n,
-        1n,
-        46827403850823179245072216630277197565144205554125654976674165829533817101731n
-    ]
     const A = BigInt("0xFD284E309E23A18641A8F545B43D3EB24539F65061F38B80C8B92678BE83A70A");
     const msg = BigInt("0x6e080211c5c69d000000000022480a20ddb010fecda643efb6e7f0fbcbb0a4ab7f23173f865b40edf47139a3627e12001224080112201c426cdc8371b36afe91a1818812087903b35c6fc6ef998d19ff2dcf6efa00a52a0c08e48bc49f0610b389b6f50132094f726169636861696e");
     const R8 = BigInt("0x1dc724b254a6734c1e470f20339333011e429576b3f5016c5c857bff1abfd189");
@@ -54,18 +48,15 @@ const main = async () => {
     const bitsA = utils.pad(utils.buffer2bits(bufA), 256);
     const chunkA = [];
     const chunkR = [];
-    const chunkG = [];
 
     for (let i = 0; i < 4; i++) {
         chunkA.push(utils.chunkBigInt(pointA[i], BigInt(2 ** 85)));
         chunkR.push(utils.chunkBigInt(pointR[i], BigInt(2 ** 85)));
-        chunkG.push(utils.chunkBigInt(pointG[i], BigInt(2 ** 85)));
     }
 
     for (let i = 0; i < 4; i++) {
         utils.pad(chunkA[i], 3);
         utils.pad(chunkR[i], 3);
-        utils.pad(chunkG[i], 3);
     }
 
     // console.log(bitsMsg.length)
@@ -86,15 +77,15 @@ const main = async () => {
     }
     
     console.log(input);
-    // const json = JSON.stringify(input, null, 2);
-    // // console.log(json);
-    // fs.writeFile('src/block/input.json', json, (err) => {
-    //     if (err) {
-    //         console.log(err);
-    //     } else {
-    //         console.log("write successful");
-    //     }
-    // });
+    const json = JSON.stringify(input, null, 2);
+    // console.log(json);
+    fs.writeFile('src/block/input.json', json, (err) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log("write successful");
+        }
+    });
     // console.log(bufS)
     // console.log(bitsS)
     
