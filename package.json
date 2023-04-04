@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "snarkjs powersoftau new bn128 22 ./ptau/powersOfTau28_hez_final_22.ptau -v",
+    "pm2-genzkey": "pm2 start npm --name \"get tau\" -- start",
+    "circom": "circom ./src/block/signature/*.circom --r1cs --wasm"
   },
   "repository": {
     "type": "git",
