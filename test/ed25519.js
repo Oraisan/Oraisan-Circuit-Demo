@@ -17,7 +17,8 @@ function binaryArrayToBytesArray(binaryArray) {
 }
 
 const main = async () => {
-    // const cir = await wasmTester(path.join(__dirname, '../electron-labs/test/verifier_test.circom'));
+    //const cir = await wasmTester(path.join(__dirname, '../electron-labs/test/verifier_test.circom'));
+    const cir = await wasmTester(path.join(__dirname, '../src/block/signature/verifySignatures.circom'));
     const pointA = [
         19609600535639426967582330360073854330664420980290928614443703354937550235772n,
         4819101209465356224883271557990864103528016550052741516590013689083114432765n,
@@ -79,7 +80,7 @@ const main = async () => {
     console.log(input);
     const json = JSON.stringify(input, null, 2);
     // console.log(json);
-    fs.writeFile('src/block/input.json', json, (err) => {
+    fs.writeFile('src/block/signature/input.json', json, (err) => {
         if (err) {
             console.log(err);
         } else {
@@ -89,19 +90,19 @@ const main = async () => {
     // console.log(bufS)
     // console.log(bitsS)
     
-    // try {
-    //     const startTime = performance.now();
-    //     const witness = await cir.calculateWitness({
-    //         msg: bitsMsg, A: bitsA, R8: bitsR8, S: bitsS, PointA: chunkA, PointR: chunkR,
-    //     });
-    //     const endTime = performance.now();
-    //     mlog.success(`Call to calculate witness took ${endTime - startTime} milliseconds`);
-    //     assert.ok(witness[0] === 1n);
-    //     assert.ok(witness[1] === 1n);
-    // } catch (e) {
-    //     mlog.error(e);
-    //     assert.ok(false);
-    // }
+    try {
+        const startTime = performance.now();
+        const witness = await cir.calculateWitness({
+            msg: bitsMsg, A: bitsA, R8: bitsR8, S: bitsS, PointA: chunkA, PointR: chunkR,
+        });
+        // const endTime = performance.now();
+        // mlog.success(`Call to calculate witness took ${endTime - startTime} milliseconds`);
+        // assert.ok(witness[0] === 1n);
+        // assert.ok(witness[1] === 1n);
+    } catch (e) {
+        mlog.error(e);
+        assert.ok(false);
+    }
 }
 main()
     .then(() => { })
