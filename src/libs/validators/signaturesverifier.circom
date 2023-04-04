@@ -174,8 +174,8 @@ template AddRHCalculation(nBytes) {
 
 template PMul1Verifier() {
     signal input S[32];
-    signal output PMul1[4][3];
-    // signal input addRH[4][3];
+    // signal output PMul1[4][3];
+    signal input addRH[4][3];
 
     var i;
     var j;
@@ -199,13 +199,14 @@ template PMul1Verifier() {
     }
 
 
-    // component equal = PointEqual();
-    for(i=0; i<4; i++) {
+    component equal = PointEqual();
+    for(i=0; i<3; i++) {
          for(j=0; j<3; j++) {
-            PMul1[i][j] <== pM.sP[i][j];
+            equal.p[i][j] <== pM.sP[i][j];
+            equal.q[i][j] <== addRH[i][j];
         }
     }
 
-    // equal.out === 1;
+    equal.out === 1;
     
 }
