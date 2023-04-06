@@ -10,8 +10,8 @@
     "zkey-signature": "snarkjs g16s ./src/block/signature/*.r1cs ./ptau/powersOfTau28_hez_final_22.ptau ./src/block/signature/circuit_final.zkey",
     "zkey-AddRH": "snarkjs g16s ./src/block/signature/verifyByBytes/calculateAddRH/*.r1cs ./ptau/powersOfTau28_hez_final_21.ptau ./src/block/signature/verifyByBytes/calculateAddRH/circuit_final.zkey",
     "zkey-PMul1": "snarkjs g16s ./src/block/signature/verifyByBytes/verifyPMul1/*.r1cs ./ptau/powersOfTau28_hez_final_21.ptau ./src/block/signature/verifyByBytes/verifyPMul1/circuit_final.zkey",
-    "zkey-encode-message": "snarkjs g16s ./test/message/*.r1cs ./ptau/powersOfTau28_hez_final_13.ptau ./test/message/circuit_final.zkey"
-
+    "zkey-encode-message": "snarkjs g16s ./test/message/*.r1cs ./ptau/powersOfTau28_hez_final_13.ptau ./test/message/circuit_final.zkey",
+    "task": "node ./tasksfile.js"
   },
   "repository": {
     "type": "git",
@@ -31,6 +31,8 @@
     "circomlib": "^2.0.5",
     "circomlibjs": "^0.1.7",
     "crypto-js": "^4.1.1",
-    "snarkjs": "^0.6.10"
+    "snarkjs": "^0.6.10",
+    "node-fetch": "^2.6.1",
+    "tasksfile": "^5.1.1"
   }
 }

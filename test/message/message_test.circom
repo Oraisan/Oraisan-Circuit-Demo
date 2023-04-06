@@ -2,4 +2,4 @@
 pragma circom 2.0.0;
 include "../../src/libs/validators/msgencodeverifier.circom";
 
-component main{public[fnc, height, blockHash, msg]} = MsgEncodeVerifierByBytes(111, 40);
+component main{public[fnc, height, blockHash, msg]} = MsgEncodeVerifierByBytes(111, 3);

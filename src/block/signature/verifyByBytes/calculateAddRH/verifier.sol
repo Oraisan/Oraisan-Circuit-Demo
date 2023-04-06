@@ -1161,6 +1161,8 @@ contract Verifier {
         )) return 1;
         return 0;
     }
+    
+    //msg =  input[64:64 + 111] === 
     /// @return r  bool true if proof is valid
     function verifyProof(
             uint[2] memory a,
