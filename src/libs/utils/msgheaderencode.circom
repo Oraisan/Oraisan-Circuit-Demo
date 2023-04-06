@@ -115,14 +115,12 @@ template MsgHeaderEncodeToBits(nMsgBytes) {
     }
 }
 
-template MsgHeaderEncodeToBytes(nMsgBytes) {
+template MsgHeaderEncodeToBytes(nMsgBytes, nSeconds, nNanos) {
     // var nType = 8;
     var nHeight = 8;
     var nHash = 32;
     var nParts = 1;
     var nTotal = 1;
-    var nSeconds = 5;
-    var nNanos = 5;
     // var nChainID = 9; 
     
     var prefixType = 8;
@@ -209,14 +207,14 @@ template MsgHeaderEncodeToBytes(nMsgBytes) {
     idx + 11 === nMsgBytes;
 }
 
-template MsgHeaderEncodeWithoutTimestampToBytes(nMsgBytes) {
+template MsgHeaderEncodeWithoutTimestampToBytes(nMsgBytes, nSeconds, nNanos) {
     // var nType = 8;
     var nHeight = 8;
     var nHash = 32;
     var nParts = 1;
     var nTotal = 1;
-    var nSeconds = 5;
-    var nNanos = 5;
+    // var nSeconds = 5;
+    // var nNanos = 5;
     // var nChainID = 9; 
     
     var prefixType = 8;

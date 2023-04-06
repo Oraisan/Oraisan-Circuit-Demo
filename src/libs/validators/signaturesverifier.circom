@@ -3,6 +3,8 @@ pragma circom 2.0.0;
 // include "../../../node_modules/circomlib/circuits/eddsa.circom";
 include "../utils/convert.circom";
 include "../../../electron-labs/verify.circom";
+include "./msgencodeverifier.circom";
+include "../../../node_modules/circomlib/circuits/comparators.circom";
 
 template SignatureVerifier(nBits) {
     signal input msg[nBits];
@@ -111,11 +113,25 @@ template SignatureVerifierByBytes(nBytes) {
     v.out === 1;
 }
 
-template AddRHCalculation(nBytes) {
+template AddRHCalculation(nSeconds, nNanos) {
+    var nParts = 1;    
+    var nChainID = 9;
+    var prefixTimestamp = 42;
+    var prefixSeconds = 8;
+    var prefixNanos = 16;
+    var nBytes = 92 + nChainID + nSeconds + nNanos;
+
+    signal input height;
+    signal input blockHash[32];
+    signal input blockTime;
+    signal input partsTotal;
+    signal input partsHash[nParts][32];
+    signal input sigTimeSeconds;
+    signal input sigTimeNanos;
+
+    
     signal input pubKeys[32];
     signal input R8[32];
-
-    signal input msg[nBytes];
 
     signal input PointA[4][3];
     signal input PointR[4][3];
@@ -124,10 +140,32 @@ template AddRHCalculation(nBytes) {
     var i;
     var j;
 
+    component isTimeGreater = GreaterEqThan(10);
+    isTimeGreater.in[0] <== sigTimeSeconds * 1000000000 + sigTimeNanos;
+    isTimeGreater.in[1] <== blockTime;
+    isTimeGreater.out === 1;
+
+    component msg = MsgEncodeByBytes(nSeconds, nNanos);
+    msg.height <== height;
+    
+    for(i = 0; i < 32; i++) {
+        msg.blockHash[i] <== blockHash[i];
+    }
+
+    msg.partsTotal <== partsTotal;
+    for(i = 0; i < nParts; i++) {
+        for(j = 0; j < 32; j++) {
+            msg.partsHash[i][j] <== partsHash[i][j];
+        }
+    }
+
+    msg.seconds <== sigTimeSeconds;
+    msg.nanos <== sigTimeNanos;
+
     component msg2Bits[nBytes];
     for(i = 0; i < nBytes; i++) {
         msg2Bits[i] = BytesToBits(8);
-        msg2Bits[i].in <== msg[i];
+        msg2Bits[i].in <== msg.out[i];
     }
 
     component pb2Bits[32];
