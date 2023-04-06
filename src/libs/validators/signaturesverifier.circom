@@ -68,7 +68,7 @@ template SignatureVerifierByBytes(nSeconds, nNanos) {
     var i;
     var j;
 
-    component isTimeGreater = GreaterEqThan(10);
+    component isTimeGreater = GreaterEqThan(80);
     isTimeGreater.in[0] <== sigTimeSeconds * 1000000000 + sigTimeNanos;
     isTimeGreater.in[1] <== blockTime;
     isTimeGreater.out === 1;
@@ -176,7 +176,7 @@ template AddRHCalculation(nSeconds, nNanos) {
     var i;
     var j;
 
-    component isTimeGreater = GreaterEqThan(10);
+    component isTimeGreater = GreaterEqThan(80);
     isTimeGreater.in[0] <== sigTimeSeconds * 1000000000 + sigTimeNanos;
     isTimeGreater.in[1] <== blockTime;
     isTimeGreater.out === 1;

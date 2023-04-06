@@ -8,9 +8,9 @@ download powersOfTau28_hez_final_22.ptau from https://github.com/iden3/snarkjs o
 then create folder ptau (same level with folder src) and save this ptau file to folder.
 
 ```
-cd src/block
+cd src/block/signature
 circom *.circom --r1cs --wasm
-cd blockverifier_js
+cd verifySignatures_js
 
 node generate_witness.js ./*.wasm ../input.json ../witness.wtns
 cd ..
