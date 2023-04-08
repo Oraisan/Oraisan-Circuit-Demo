@@ -5,7 +5,7 @@ include "../../../node_modules/circomlib/circuits/bitify.circom";
 
 template Sha256Bytes(n) {
     signal input in[n];
-    signal output out[n];
+    signal output out[32];
 
     component byteToBits[n];
     for (var i = 0; i < n; i++) {
@@ -20,7 +20,7 @@ template Sha256Bytes(n) {
         }
     }
 
-    component bitsToBytes[n];
+    component bitsToBytes[32];
     for (var i = 0; i < 32; i++) {
         bitsToBytes[i] = Bits2Num(8);
         for (var j = 0; j < 8; j++) {
@@ -33,7 +33,7 @@ template Sha256Bytes(n) {
 template HashInner(n) {
     signal input L[n];
     signal input R[n];
-    signal output out[n];
+    signal output out[32];
 
     component h = Sha256Bytes(2*n + 1);
 
@@ -44,7 +44,7 @@ template HashInner(n) {
         h.in[i+n+1] <== R[i];
     }
 
-     for(var i = 0; i < n; i++) {
+     for(var i = 0; i < 32; i++) {
         out[i] <== h.out[i];
     }
 }
@@ -52,7 +52,7 @@ template HashInner(n) {
 
 template HashLeaf(n) {
     signal input leaf[n];
-    signal output out[n];
+    signal output out[32];
 
     component h = Sha256Bytes(n+1);
     h.in[0] <== 0;
