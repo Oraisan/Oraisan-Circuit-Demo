@@ -48,25 +48,22 @@ template CdcEncodeBlockTime(prefixSeconds, prefixNanos, nSeconds, nNanos) {
 }
 
 template CdcEncodeBlockID(prefixHash, prefixParts, prefixPartsHash, prefixPartsTotal) {
-    var nParts = 1;
-
     var i;
     var j;
     var idx;
 
     signal input blockHash[32];
     signal input partsTotal;
-    signal input partsHash[nParts][32];
+    signal input partsHash[32];
 
-    signal output out[38 + nParts * 34];
+    signal output out[72];
 
     component ps = EncodeParts(prefixParts, prefixPartsHash, prefixPartsTotal);
     ps.total <== partsTotal;
-    for(i = 0; i < nParts; i++) {
-        for(j = 0; j < 32; j++) {
-            ps.hash[i][j] <== partsHash[i][j];
-        }
+    for(i = 0; i < 32; i++) {
+            ps.hash[i] <== partsHash[i];
     }
+    
 
     out[0] <== prefixHash;
     out[1] <== 32;
@@ -74,7 +71,7 @@ template CdcEncodeBlockID(prefixHash, prefixParts, prefixPartsHash, prefixPartsT
         out[i + 2] <== blockHash[i]; 
     }
 
-    for(i = 0; i < 4 + nParts * 34; i++) {
+    for(i = 0; i < 38; i++) {
         out[i + 34] <== ps.out[i];
     }
 }

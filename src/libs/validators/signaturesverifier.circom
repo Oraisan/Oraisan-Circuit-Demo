@@ -7,7 +7,6 @@ include "../../../electron-labs/verify.circom";
 include "../../../node_modules/circomlib/circuits/comparators.circom";
 
 template SignatureVerifier(nChainID, nSeconds, nNanos) {
-    var nParts = 1;    
     var nBytes = 92 + nChainID + nSeconds + nNanos;
 
     signal input type;
@@ -16,7 +15,7 @@ template SignatureVerifier(nChainID, nSeconds, nNanos) {
     signal input blockHash[32];
     signal input blockTime; 
     signal input partsTotal;
-    signal input partsHash[nParts][32];
+    signal input partsHash[32];
     signal input sigTimeSeconds;
     signal input sigTimeNanos;
 
@@ -54,11 +53,10 @@ template SignatureVerifier(nChainID, nSeconds, nNanos) {
     }
 
     msg.partsTotal <== partsTotal;
-    for(i = 0; i < nParts; i++) {
-        for(j = 0; j < 32; j++) {
-            msg.partsHash[i][j] <== partsHash[i][j];
-        }
+    for(i = 0; i < 32; i++) {
+        msg.partsHash[i] <== partsHash[i];
     }
+    
 
     msg.seconds <== sigTimeSeconds;
     msg.nanos <== sigTimeNanos;

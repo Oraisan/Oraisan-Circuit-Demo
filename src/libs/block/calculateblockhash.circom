@@ -5,7 +5,6 @@ include "../utils/filedsblockheaderencode.circom";
 include "../AVL_Tree/avlverifier.circom";
 
 template CalculateBlockHash() {
-    var nParts = 1;
     // signal input versionBlock;
     // signal input versionApp;
     // signal input chainID;
@@ -16,7 +15,7 @@ template CalculateBlockHash() {
     signal input time;
     signal input lastBlockHash[32];
     signal input lastPartsTotal;
-    signal input lastPartsHash[nParts][32];
+    signal input lastPartsHash[32];
     signal input lastCommitHash[32];
     signal input dataHash[32];
     signal input validatorsHash[32];
@@ -36,9 +35,8 @@ template CalculateBlockHash() {
         h.versionHash[i] <== versionHash[i];
         h.chainIDHash[i] <== chainIDHash[i];
         h.lastBlockHash[i] <== lastBlockHash[i];
-        for(j = 0; j < nParts; j++) {
-            h.lastPartsHash[j][i] <== lastPartsHash[j][i];
-        }
+        h.lastPartsHash[i] <== lastPartsHash[i];
+        
         h.lastCommitHash[i] <== lastCommitHash[i];
         h.dataHash[i] <== dataHash[i];
         h.validatorsHash[i] <== validatorsHash[i];

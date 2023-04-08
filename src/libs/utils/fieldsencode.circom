@@ -31,45 +31,27 @@ template EncodeTimeUnit(prefix, n) {
 
 template EncodeParts(prefix, prefixPartsHash, prefixPartsTotal) {
 
-    var nHash = 32;
-    var nParts = 1;
-    var nTotal = 1;
-    var len_part = 2 + nParts * (nHash + 1) + nTotal;
-    var len_parts_bytes = 1;
-    var parts_bytes = 1 + len_parts_bytes + nParts * (nHash + 2) + nTotal + 3;
+    signal input total;
+    signal input hash[32];
+    signal output out[38];
 
     var i;
     var j;
-    var idx;
 
-    signal input total;
-    signal input hash[nParts][nHash];
-
-    signal output out[parts_bytes];
-
-    component len = SovNumToBytes(len_parts_bytes);
-    len.in <==  len_part;
+    component len = SovNumToBytes(1);
+    len.in <==  36;
 
     out[0] <== prefix;
-    idx = 1;
+    out[1] <== len.out[0];
 
-    for(i = 0; i < len_parts_bytes; i++) {
-        out[i + idx] <== len.out[i];
-    }
-    idx += len_parts_bytes;
+    out[2] <== prefixPartsTotal;
+    out[3] <== total;
 
-    out[idx] <== prefixPartsTotal;
-    out[idx + 1] <== total;
-
-    idx += 2;
-    for(i = 0; i < nParts; i++) {
-        out[idx] <== prefixPartsHash;
-        out[idx + 1] <== nHash;
-        for(j = 0; j < nHash; j++) {
-            out[j + idx + 2] <== hash[i][j];
-        }
-
-        idx += nHash + 3;
+    out[4] <== prefixPartsHash;
+    out[5] <== 32;
+    
+    for(i = 0; i < 32; i++) {
+            out[i + 6] <== hash[i];
     }
 }
 

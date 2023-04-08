@@ -39,52 +39,38 @@ template EncodeTimestamp(prefix, prefixSeconds, prefixNanos, nSeconds, nNanos) {
 }
 
 template EncodeBlockID(prefix, prefixHash, prefixParts, prefixPartsHash, prefixPartsTotal) {
-    var nHash = 32;
-    var nParts = 1;
-    var nTotal = 1;
-    var len_part = 2 + nParts * (nHash + 1) + nTotal;
-    var len_parts_bytes = 1;
-    var len_blockID = 72;
-    var len_blockID_bytes = 1;
-    var blockID_bytes = 1 + len_blockID_bytes + nHash + 2 + nParts * (nHash + 2) + nTotal + 3;
 
+    signal input blockHash[32];
+    signal input partsTotal;
+    signal input partsHash[32];
+
+    signal output out[74];
     var i;
     var j;
-    var idx;
 
-    signal input blockHash[nHash];
-    signal input partsTotal;
-    signal input partsHash[nParts][nHash];
-
-    signal output out[blockID_bytes];
-
-    component sovLength = SovNumToBytes(len_blockID_bytes);
-    sovLength.in <== len_blockID;
+    component sovLength = SovNumToBytes(1);
+    sovLength.in <== 72;
 
     component ps = EncodeParts(prefixParts, prefixPartsHash, prefixPartsTotal);
+   
     ps.total <== partsTotal;
-    for(i = 0; i < nParts; i++) {
-        for(j = 0; j < nHash; j++) {
-            ps.hash[i][j] <== partsHash[i][j];
-        }
+    for(i = 0; i < 32; i++) {
+        ps.hash[i] <== partsHash[i];
     }
+    
 
     out[0] <== prefix;
-
-    idx = 1;
-    for(i = 0; i < len_blockID_bytes; i++) {
-        out[i+idx] <== sovLength.out[i];
+    out[1] <== sovLength.out[0];
+    
+    out[2] <== prefixHash;
+    out[3] <== 32;
+    
+    for(i = 0; i < 32; i++) {
+        out[i + 4] <== blockHash[i]; 
     }
-    idx += len_blockID_bytes;
-    out[idx] <== prefixHash;
-    out[idx + 1] <== nHash;
-    for(i = 0; i < nHash; i++) {
-        out[i + idx + 2] <== blockHash[i]; 
-    }
-    idx += 2 + nHash;
 
-    for(i = 0; i < 1 + len_parts_bytes + len_part; i++) {
-        out[i + idx] <== ps.out[i];
+    for(i = 0; i < 38; i++) {
+        out[i + 36] <== ps.out[i];
     }
 }
 

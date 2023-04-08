@@ -3,14 +3,13 @@ pragma circom 2.0.0;
 include "../../libs/validators/signaturesverifier.circom";
 
 template VerifySignature(nChainID, nSeconds, nNanos) {
-    var nParts = 1;
     // signal input type;
     // signal input chainID[nChainID];
     signal input height; 
     signal input blockHash[32];
     signal input blockTime; 
     signal input partsTotal;
-    signal input partsHash[nParts][32];
+    signal input partsHash[32];
     signal input sigTimeSeconds;
     signal input sigTimeNanos;
 
@@ -43,11 +42,10 @@ template VerifySignature(nChainID, nSeconds, nNanos) {
     sv.blockTime <== blockTime;
     sv.partsTotal <== partsTotal;
 
-    for(i = 0; i < nParts; i++) {
-        for(j = 0; j < 32; j++) {
-            sv.partsHash[i][j] <== partsHash[i][j];
-        }
+    for(i = 0; i < 32; i++) {
+        sv.partsHash[i] <== partsHash[i];
     }
+    
 
     sv.sigTimeSeconds <== sigTimeSeconds;
     sv.sigTimeNanos <== sigTimeNanos;

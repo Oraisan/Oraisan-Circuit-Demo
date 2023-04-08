@@ -57,11 +57,10 @@ template HashBlockTime(prefixSeconds, prefixNanos, nSeconds, nNanos) {
 }
 
 template HashBlockID(prefixHash, prefixParts, prefixPartsHash, prefixPartsTotal) {
-    var nParts = 1;
 
     signal input blockHash[32];
     signal input partsTotal;
-    signal input partsHash[nParts][32];
+    signal input partsHash[32];
     signal output out[32];
     var i;
     var j;
@@ -72,14 +71,13 @@ template HashBlockID(prefixHash, prefixParts, prefixPartsHash, prefixPartsTotal)
     }
     ec.partsTotal <== partsTotal;
 
-    for(i = 0; i < nParts; i++) {
-        for(j = 0; j < 32; j++) {
-            ec.partsHash[i][j] <== partsHash[i][j];
-        }
+    for(i = 0; i < 32; i++) {
+        ec.partsHash[i] <== partsHash[i];
     }
+    
 
-    component h = HashLeaf(38 + nParts * 34);
-    for(var i = 0; i < 38 + nParts * 34; i++) {
+    component h = HashLeaf(72);
+    for(var i = 0; i < 72; i++) {
         h.leaf[i] <== ec.out[i];
     }
 
@@ -92,7 +90,6 @@ template HashElementsBlock() {
     var nSeconds = 5;
     var nNanos = 5;
     var nHeight = 4;
-    var nParts = 1;    
 
     var prefixSeconds = 8;
     var prefixNanos = 16;
@@ -114,7 +111,7 @@ template HashElementsBlock() {
     signal input time;
     signal input lastBlockHash[32];
     signal input lastPartsTotal;
-    signal input lastPartsHash[nParts][32];
+    signal input lastPartsHash[32];
     signal input lastCommitHash[32];
     signal input dataHash[32];
     signal input validatorsHash[32];
@@ -141,11 +138,10 @@ template HashElementsBlock() {
     }
     lastBlockIDHash.partsTotal <== lastPartsTotal;
 
-    for(i = 0; i < nParts; i++) {
-        for(j = 0; j < 32; j++) {
-            lastBlockIDHash.partsHash[i][j] <== lastPartsHash[i][j];
-        }
+    for(i = 0; i < 32; i++) {
+        lastBlockIDHash.partsHash[i] <== lastPartsHash[i];
     }
+    
 
     component bytesHash[8];
     for(i = 0; i < 8; i++) {
