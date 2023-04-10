@@ -29,8 +29,8 @@ template EncodeVersionApp(prefix) {
 template CdcEncodeBlockTime(prefixSeconds, prefixNanos, nSeconds, nNanos) {
     signal input blockTime;
     signal output out[nSeconds + nNanos + 2];
-    var nanos = blockTime % 1000000000;
-    var seconds = (blockTime - nanos) / 1000000000;
+    var seconds = blockTime / 1000000000;
+    var nanos = blockTime  - seconds * 1000000000;
 
     component eS = EncodeTimeUnit(prefixSeconds, nSeconds);
     eS.timeUnit <== seconds;
@@ -101,7 +101,7 @@ template CdcEncodeInt(prefix, n) {
     out[0] <== prefix;
     
     component sntb = SovNumToBytes(n);
-    sntb <== intValue;
+    sntb.in <== intValue;
     for(var i = 0; i < n; i++) {
         out[i + 1] <== sntb.out[i];
     }

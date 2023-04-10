@@ -4,26 +4,27 @@ include "avlhash.circom";
 include "avlverifierlevel.circom";
 include "../../../node_modules/circomlib/circuits/comparators.circom";
 
-template CalculateRootFromSiblings(nLevels) {
-    signal input siblings[nLevels][32];
+template CalculateRootFromSiblings(nSiblings) {
+    assert(nSiblings > 0);
+
+    signal input siblings[nSiblings][32];
 
     signal input key;
     signal input value[32];
     signal output root[32];
     
 
-    component n2bNew = Num2Bits(nLevels);
+    component n2bNew = Num2Bits(nSiblings);
     n2bNew.in <== key;
 
     var i;
     var j;
 
-    component is0[nLevels];
-    component levels[nLevels];
+    component is0[nSiblings];
+    component levels[nSiblings];
     var s = 0;
 
-    component testHash = HashInner(32);
-    for(i=nLevels-1; i >= 0; i--) {
+    for(i=nSiblings-1; i >= 0; i--) {
         s = 0;
         for(j = 0; j < 32; j++) {
             s += siblings[i][j];
@@ -34,15 +35,15 @@ template CalculateRootFromSiblings(nLevels) {
 
         levels[i] = AVLVerifierLevel(32);
         
-        levels[i].st_top <== is0[i].out;
-        levels[i].lrbit <== n2bNew.out[i];
+        levels[i].st_top <== 1 - is0[i].out;
+        levels[i].lrbit <== n2bNew.out[nSiblings - 1 - i];
         for(j = 0; j < 32; j++) {
             levels[i].sibling[j] <== siblings[i][j];
         }
 
-        if(i == nLevels-1) {
+        if(i == nSiblings-1) {
             for(j = 0; j < 32; j++) {
-                levels[i].child[j] <== 0;
+                levels[i].child[j] <== value[j];
             }
         } else {
             for(j = 0; j < 32; j++) {
@@ -50,6 +51,10 @@ template CalculateRootFromSiblings(nLevels) {
             }
         }
         
+    }
+
+    for(i = 0; i < 32; i++) {
+        root[i] <== levels[0].root[i];
     }
 }
 

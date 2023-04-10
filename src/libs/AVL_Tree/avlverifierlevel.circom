@@ -14,13 +14,11 @@ template AVLVerifierLevel(nBytes) {
 
     component switcher[nBytes];
     component proofHash = HashInner(nBytes);
-
     for(var i = 0; i < nBytes; i++) {
         switcher[i] = Switcher();
         switcher[i].L <== child[i];
         switcher[i].R <== sibling[i];
         switcher[i].sel <== lrbit;
-        log(switcher[i].outL, switcher[i].outR);
     }
 
     for(var i = 0; i < nBytes; i++) {
@@ -29,7 +27,6 @@ template AVLVerifierLevel(nBytes) {
     }
 
     for(var i = 0; i < nBytes; i++) {
-        root[i] <== proofHash.out[i] * st_top;
-        log(root[i]);
+        root[i] <== (proofHash.out[i] - child[i]) * st_top + child[i];
     }
 }

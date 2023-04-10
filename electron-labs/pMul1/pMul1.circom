@@ -24,7 +24,6 @@ template pMul1Verifier() {
         }
     }
 
-    log(equal.out);
     equal.out === 1;
 }
 

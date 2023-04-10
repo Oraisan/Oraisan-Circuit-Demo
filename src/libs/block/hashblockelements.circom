@@ -14,7 +14,7 @@ template HashBytesElemnt(prefix, nBytes) {
 
     component h = HashLeaf(nBytes + 2);
     for(var i = 0; i < nBytes + 2; i++) {
-        h.leaf[i] <== ec.out[i];
+        h.in[i] <== ec.out[i];
     }
 
     for(var i = 0; i < 32; i++) {
@@ -31,7 +31,7 @@ template HashIntElement(prefix, nBytes) {
 
     component h = HashLeaf(nBytes + 1);
     for(var i = 0; i < nBytes + 1; i++) {
-        h.leaf[i] <== ec.out[i];
+        h.in[i] <== ec.out[i];
     }
 
     for(var i = 0; i < 32; i++) {
@@ -48,7 +48,7 @@ template HashBlockTime(prefixSeconds, prefixNanos, nSeconds, nNanos) {
 
     component h = HashLeaf(nSeconds + nNanos + 2);
     for(var i = 0; i < nSeconds + nNanos + 2; i++) {
-        h.leaf[i] <== ec.out[i];
+        h.in[i] <== ec.out[i];
     }
 
     for(var i = 0; i < 32; i++) {
@@ -78,7 +78,7 @@ template HashBlockID(prefixHash, prefixParts, prefixPartsHash, prefixPartsTotal)
 
     component h = HashLeaf(72);
     for(var i = 0; i < 72; i++) {
-        h.leaf[i] <== ec.out[i];
+        h.in[i] <== ec.out[i];
     }
 
     for(var i = 0; i < 32; i++) {
@@ -86,10 +86,10 @@ template HashBlockID(prefixHash, prefixParts, prefixPartsHash, prefixPartsTotal)
     }
 }
 
-template HashElementsBlock() {
-    var nSeconds = 5;
-    var nNanos = 5;
-    var nHeight = 4;
+template HashElementsBlock(nHeight, nSeconds, nNanos) {
+    // var nSeconds = 5;
+    // var nNanos = 5;
+    // var nHeight = 4;
 
     var prefixSeconds = 8;
     var prefixNanos = 16;
@@ -170,7 +170,7 @@ template HashElementsBlock() {
         out[3][i] <== blockTimeHash.out[i];
         out[4][i] <== lastBlockIDHash.out[i];
         for(j = 0; j < 8; j++) {
-            out[5+j] <== bytesHash[j].out[i];
+            out[5+j][i] <== bytesHash[j].out[i];
         }
         out[13][i] <== proposerAddressHash.out[i];
     }

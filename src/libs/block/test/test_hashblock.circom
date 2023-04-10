@@ -2,4 +2,4 @@
 pragma circom 2.0.0;
 include "../calculateblockhash.circom";
 
-component main{public[in]} = CalculateRootFromLeafs(14);
+component main{public[in]} = CalculateRootFromLeafs(2);
