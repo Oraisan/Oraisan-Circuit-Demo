@@ -26,13 +26,16 @@
   "homepage": "https://github.com/Oraisan/Oraisan-Circuit-Demo#readme",
   "dependencies": {
     "@electron-labs/sha512": "^1.0.4",
+    "bigint-buffer": "^1.1.5",
     "bigint-mod-arith": "^3.1.2",
+    "bn.js": "^5.2.1",
     "circom_tester": "^0.0.19",
     "circomlib": "^2.0.5",
     "circomlibjs": "^0.1.7",
     "crypto-js": "^4.1.1",
-    "snarkjs": "^0.6.10",
+    "fixed-merkle-tree": "git+https://github.com/lquochieu/fixed-merkle-tree.git",
     "node-fetch": "^2.6.1",
+    "snarkjs": "^0.5.0",
     "tasksfile": "^5.1.1"
   }
 }

@@ -1,6 +1,6 @@
 const path = require('path');
 const wasmTester = require('circom_tester').wasm;
-const utils = require('./utils');
+const utils = require('../../utils');
 const fs = require("fs");
 const assert = require('assert');
 

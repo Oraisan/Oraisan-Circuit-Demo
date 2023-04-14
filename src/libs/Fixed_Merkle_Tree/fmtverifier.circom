@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
 include "./fmthash.circom";
 include "../../../node_modules/circomlib/circuits/switcher.circom";
@@ -30,8 +31,6 @@ template CalculateRootFromSiblings(nSiblings) {
 }
 
 template CalculateRootFromLeafs(nLeafs) {
-    checkNLeafs(nLeafs) === 1;
-    
     signal input in[nLeafs];
     signal output out;
     var i;
@@ -63,10 +62,11 @@ template CalculateRootFromLeafs(nLeafs) {
     }
 }
 
-function checkNLeafs(nLeafs) {
+function getHeight(nLeafs) {
     var i = 1;
-    for(i = 1; i * 2 < nLeafs; i *= 2) {
-        
+    var j = 0;
+    for(i = 1; i * 2 <= nLeafs; i *= 2) {
+        j++;
     }
-    return i == nLeafs;
+    return j;
 }
