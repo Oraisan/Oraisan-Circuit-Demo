@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
-include "../../libs/validators/signaturesverifier.circom";
+include "../../../libs/validators/signaturesverifier.circom";
 
 template VerifySignature(nChainID, nSeconds, nNanos) {
     // signal input type;
@@ -63,4 +63,4 @@ template VerifySignature(nChainID, nSeconds, nNanos) {
         }
     }
 }
-component main{public[height, blockHash, blockTime, pubKeys, R8, S]} = VerifySignature(9, 5, 5);
+component main{public[height, blockHash, blockTime, pubKeys]} = VerifySignature(9, 5, 5);

@@ -7,10 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "snarkjs powersoftau new bn128 22 ./ptau/powersOfTau28_hez_final_22.ptau -v",
     "circom": "circom ./src/block/signature/*.circom --r1cs --wasm",
-    "zkey-signature": "snarkjs g16s ./src/block/signature/*.r1cs ./ptau/powersOfTau28_hez_final_22.ptau ./src/block/signature/circuit_final.zkey",
+    "zkey-signature": "snarkjs g16s ./src/block/signature/msg_110/*.r1cs ./ptau/powersOfTau28_hez_final_22.ptau ./src/block/signature/msg_110/circuit_final.zkey",
     "zkey-AddRH": "snarkjs g16s ./src/block/signature/verifyByBytes/calculateAddRH/*.r1cs ./ptau/powersOfTau28_hez_final_21.ptau ./src/block/signature/verifyByBytes/calculateAddRH/circuit_final.zkey",
     "zkey-PMul1": "snarkjs g16s ./src/block/signature/verifyByBytes/verifyPMul1/*.r1cs ./ptau/powersOfTau28_hez_final_21.ptau ./src/block/signature/verifyByBytes/verifyPMul1/circuit_final.zkey",
     "zkey-encode-message": "snarkjs g16s ./test/message/*.r1cs ./ptau/powersOfTau28_hez_final_13.ptau ./test/message/circuit_final.zkey",
+    "verifier-contract": "snarkjs zkesv ./src/block/signature/msg_111/*.zkey ./src/block/signature/msg_111/verifier.sol",
     "task": "node ./tasksfile.js"
   },
   "repository": {

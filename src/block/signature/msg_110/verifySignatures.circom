@@ -63,4 +63,4 @@ template VerifySignature(nChainID, nSeconds, nNanos) {
         }
     }
 }
-component main{public[height, blockHash, blockTime, pubKeys, R8, S]} = VerifySignature(9, 5, 4);
+component main{public[height, blockHash, blockTime, pubKeys]} = VerifySignature(9, 5, 4);
