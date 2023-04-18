@@ -26,7 +26,9 @@ template HashInner(n) {
 template HashLeaf(n) {
     signal input in[n];
     signal output out[32];
-
+    // for(var i = 0; i < n; i++) {
+    //     log("std", i , in[i]);
+    // }
     component h = Sha256Bytes(n+1);
     h.in[0] <== 0;
     for(var i = 0; i < n; i++) {

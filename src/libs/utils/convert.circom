@@ -86,3 +86,21 @@ template SovNumToBits(nBits) {
     }
     out[nBits - 1] <== 0;
 }
+
+template SwitchSovByte() {
+    signal input xor;
+    signal input in;
+    signal output out;
+
+    component numToBits = Num2Bits(8);
+    numToBits.in <== in;
+
+    component bitsToBytes = BitsToBytes(1);
+    for(var i = 0; i < 7; i++) {
+        bitsToBytes.in[i] <== numToBits.out[i];
+    }
+
+    bitsToBytes.in[7] <== xor;
+
+    out <== bitsToBytes.out[0];
+}

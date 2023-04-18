@@ -105,8 +105,9 @@ template testHash(n) {
         out1.in[i] <== in1[i];
     }
 
-    component btb = LastBytesSHA256(8 * n);
-
+    component btb = LastBytesSHA256();
+    btb.in <== 8 * n;
+    
     out2 = Sha256Prepared(1);
     for(var i = 0; i < n; i++) {
         out2.in[i] <== in1[i];

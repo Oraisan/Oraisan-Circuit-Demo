@@ -4,16 +4,20 @@ include "../../../node_modules/circomlib/circuits/sha256/constants.circom";
 include "../../../node_modules/circomlib/circuits/sha256/sha256compression.circom";
 include "../../../node_modules/circomlib/circuits/bitify.circom";
 
-template LastBytesSHA256(nBits) {
+template LastBytesSHA256() {
+    signal input in;
     signal output out[8];
+
+    component ntb = Num2Bits(64);
+    ntb.in <== in;
 
     component btb = BitsToBytes(8);
     for(var i = 0; i < 64; i++) {
-        btb.in[i] <== (nBits >> i)&1;
+        btb.in[i] <== ntb.out[i];
     }
 
     for(var i = 0; i < 8; i++) {
-        out[i] <== btb.out[i];
+        out[i] <== btb.out[7 - i];
     }
 }
 

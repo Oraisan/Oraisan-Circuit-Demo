@@ -89,6 +89,7 @@ template CalculateRootFromLeafs(nLeafs) {
         }
 
         parrent = HashInner(32);
+        log("parrent");
         for(i = 0; i < 32; i++) {
             parrent.L[i] <== left.out[i];
             parrent.R[i] <== right.out[i];
