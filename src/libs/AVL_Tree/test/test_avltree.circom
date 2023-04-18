@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
 include "../avlverifier.circom";
-include "../avlhash.circom";
+include "../../sha256/sha256standard.circom";
+include "../../sha256/sha256prepared.circom";
+include "../../utils/convert.circom";
 
 template VerifyRoot(nLeafs) {
     signal input in[nLeafs][32];
@@ -93,4 +95,33 @@ template VerifyParentBySiblings(nSiblings) {
     }
 }
 
-component main{public[in]} = VerifyParentBySiblings(3);
+template testHash(n) {
+    signal input in1[n];
+    
+    component out1;
+    component out2;
+    out1 = Sha256Bytes(n);
+    for(var i = 0; i < n; i++) {
+        out1.in[i] <== in1[i];
+    }
+
+    component btb = LastBytesSHA256(8 * n);
+
+    out2 = Sha256Prepared(1);
+    for(var i = 0; i < n; i++) {
+        out2.in[i] <== in1[i];
+    }
+    out2.in[n] <== 128;
+    for(var i = n + 1; i < 56; i++) {
+        out2.in[i] <== 0;
+    }
+
+    for(var i = 0; i < 8; i++) {
+        out2.in[63 - i] <== btb.out[i];
+    }
+
+    for(var i = 0; i < 32; i++) {
+        out1.out[i] === out2.out[i];
+    }
+}
+component main = testHash(2);
