@@ -2,6 +2,8 @@
 pragma circom 2.0.0;
 
 include "../validatorhash.circom";
+include "../validatoraddress.circom";
+include "../../../../node_modules/circomlib/circuits/bitify.circom";
 include "../../AVL_Tree/avlhash.circom";
 
 template VerifyEncode() {
@@ -57,4 +59,19 @@ template VerifyRootVal(nVals) {
         root[i] === r.out[i];
     }
 }
-component main = VerifyRootVal(2);
+
+template VerifyValidatorAddress() {
+    signal input pubkeys[32];
+    signal input address;
+
+    component addr = CalculateValidatorAddress();
+    for(var i = 0; i < 32; i++) {
+        addr.pubkeys[i] <== pubkeys[i];
+        
+    }
+
+    component ntb = Num2Bits(160);
+    ntb.in <== address;
+    address === addr.address;
+}
+component main{public[address]} = VerifyValidatorAddress();

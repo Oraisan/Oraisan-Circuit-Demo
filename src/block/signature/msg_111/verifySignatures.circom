@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
 include "../../../libs/validators/signaturesverifier.circom";
+include "../../../libs/utils/address.circom";
 
 template VerifySignature(nChainID, nSeconds, nNanos) {
     // signal input type;
@@ -20,6 +21,8 @@ template VerifySignature(nChainID, nSeconds, nNanos) {
     signal input PointA[4][3];
     signal input PointR[4][3];
 
+    signal output validatorAddress;
+    signal output blockhashAddress;
     var i;
     var j;
     var type = 2;
@@ -62,5 +65,20 @@ template VerifySignature(nChainID, nSeconds, nNanos) {
             sv.PointR[i][j] <== PointR[i][j];
         }
     }
+
+    component addr = CalculateValidatorAddress();
+    for(i = 0; i < 32; i++) {
+        addr.in[i] <== pubKeys[i];
+    }
+
+    validatorAddress <== addr.out;
+
+    component blockAddr = CalculateValidatorAddress();
+    for(i = 0; i < 32; i++) {
+        blockAddr.in[i] <== blockHash[i];
+    }
+
+    blockhashAddress <== blockAddr.out;
 }
-component main{public[height, blockHash, blockTime, pubKeys]} = VerifySignature(9, 5, 5);
+
+component main{public[height, blockTime]} = VerifySignature(9, 5, 5);

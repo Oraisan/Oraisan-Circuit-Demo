@@ -52,11 +52,6 @@ template VerifyValidatorsHash(nVals) {
         blockHash[i] === bh.blockHash[i];
     }
 
-    for(i = 0; i < 32; i++) {
-        dataHashLeaf.in[i] <== dataHash[i];
-        validatorHashLeaf.in[i] <== validatorHash[i];
-    }
-
     component 
     component cvp = CheckVotingPower(nVals);
 

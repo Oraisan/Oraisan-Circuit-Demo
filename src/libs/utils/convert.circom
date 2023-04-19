@@ -47,6 +47,30 @@ template NumToBytes(nBytes) {
     }
 }
 
+template BytesToNum(nBytes) {
+    signal input in[nBytes];
+    signal output out;
+
+    var i;
+    var j;
+
+    component btb[nBytes];
+    for(i = 0; i < nBytes; i++) {
+        btb[i] = Num2Bits(8);
+        btb[i].in <== in[i];
+    } 
+
+    component btn = Bits2Num(8 * nBytes);
+    for(i = 0; i < nBytes; i++) {
+        for(j = 0; j < 8; j++) {
+            btn.in[8 * nBytes - 8 * i - j - 1] <== btb[i].out[7 - j];
+            // log(i, j, btb[i].out[j]);
+        }
+    }
+
+    out <== btn.out;
+}
+
 template SovNumToBytes(nBytes) {
     signal input in;
     signal output out[nBytes];
