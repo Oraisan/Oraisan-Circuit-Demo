@@ -64,7 +64,7 @@ template VerifyValidatorAddress() {
     signal input pubkeys[32];
     signal input address;
 
-    component addr = CalculateValidatorAddress();
+    component addr = CalculateAddress();
     for(var i = 0; i < 32; i++) {
         addr.pubkeys[i] <== pubkeys[i];
         

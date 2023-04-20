@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
 include "../avlverifier.circom";
+include "../avlhash.circom";
 include "../../sha256/sha256standard.circom";
 include "../../sha256/sha256prepared.circom";
 include "../../utils/convert.circom";
@@ -125,4 +126,28 @@ template testHash(n) {
         out1.out[i] === out2.out[i];
     }
 }
-component main = testHash(2);
+
+template VerifyHashChild() {
+    signal input in[32];
+    // signal input a[32];
+    var i;
+
+    component hc[2];
+    hc[0] = HashChilds(32);
+    for(i = 0; i < 32; i++) {
+        hc[0].L[i] <== in[i];
+        hc[0].R[i] <== 0;
+    }
+
+    hc[1] = HashChilds(32);
+    for(i = 0; i < 32; i++) {
+        hc[1].R[i] <== in[i];
+        hc[1].L[i] <== 0;
+    }
+
+    for(i = 0; i < 32; i++) {
+        in[i] === hc[0].out[i];
+        in[i] === hc[1].out[i];
+    }
+}
+component main = VerifyHashChild();

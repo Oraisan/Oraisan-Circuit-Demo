@@ -23,17 +23,20 @@ template VerifyDAVHash() {
     for(i = 0; i < 32; i++) {
         validatorsHashLeaf.in[i] <== validatorsHash[i];
     }
-
+    
     component parrent = HashInner(32);
     for(i = 0; i < 32; i++) {
         parrent.L[i] <== dataHashLeaf.out[i];
         parrent.R[i] <== validatorsHashLeaf.out[i];
     }
+    for(i = 0; i < 8; i++) {
+        log(parrent.out[i]);
+    }
 
     component root = CalculateRootFromSiblings(3);
     for(i = 0; i < 3; i++) {
         for(j = 0; j < 32; j++) {
-            root.siblings[i][j] <== parrentSiblings[2-i][j];
+            root.siblings[i][j] <== parrentSiblings[i][j];
         }
     }
     

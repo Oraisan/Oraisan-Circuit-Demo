@@ -66,14 +66,14 @@ template VerifySignature(nChainID, nSeconds, nNanos) {
         }
     }
 
-    component addr = CalculateValidatorAddress();
+    component addr = CalculateAddress();
     for(i = 0; i < 32; i++) {
         addr.in[i] <== pubKeys[i];
     }
 
     validatorAddress <== addr.out;
 
-    component blockAddr = CalculateValidatorAddress();
+    component blockAddr = CalculateAddress();
     for(i = 0; i < 32; i++) {
         blockAddr.in[i] <== blockHash[i];
     }

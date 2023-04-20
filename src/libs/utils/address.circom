@@ -4,7 +4,7 @@ pragma circom 2.0.0;
 include "../sha256/sha256standard.circom";
 include "./convert.circom";
 
-template CalculateValidatorAddress() {
+template CalculateAddress() {
     signal input in[32];
     signal output  out;
 

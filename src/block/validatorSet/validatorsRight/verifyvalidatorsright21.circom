@@ -14,7 +14,12 @@ template VerifyValidatorRight(nVals, nSiblings) {
     signal input pubkeys[nVals][32];
     signal input votingPowers[nVals];
     signal input childRoot[nSiblings][32];
+
     signal input validatorHash[32];
+    signal input dataHash[32];
+    signal input parrentSiblings[3][32];
+    signal input blockHash[32];
+    
     signal input signed;
     
     signal output totalVPsigned;
@@ -41,11 +46,11 @@ template VerifyValidatorRight(nVals, nSiblings) {
 
     component r = CalculateRootFromSiblings(nSiblings);
     
-    r.key <== 0;
+    r.key <== 1;
     
     for(i = 0; i < nSiblings; i++) {
         for(j = 0; j < 32; j++) {
-            r.siblings[i][j] <== childRoot[i][j];
+            r.siblings[i][j] <== childRoot[nSiblings - i -1][j];
         }
     }
 
@@ -59,7 +64,7 @@ template VerifyValidatorRight(nVals, nSiblings) {
 
     // Verify blockHash
     component bh = CalculateBlockHashFromDataAndVals();
-    for(i = 0; i < nVals; i++) {
+    for(i = 0; i < 32; i++) {
         bh.dataHash[i] <== dataHash[i];
         bh.validatorsHash[i] <== validatorHash[i];
 
@@ -68,7 +73,7 @@ template VerifyValidatorRight(nVals, nSiblings) {
         }
     }
 
-    for(i = 0; i < nVals; i++) {
+    for(i = 0; i < 32; i++) {
         blockHash[i] === bh.blockHash[i];
     }
 
@@ -93,7 +98,7 @@ template VerifyValidatorRight(nVals, nSiblings) {
     // ouput
     component addr[nVals];
     for(i = 0; i < nVals; i++) {
-        addr[i] = CalculateValidatorAddress();
+        addr[i] = CalculateAddress();
         for(j = 0; j < 32; j++) {
             addr[i].in[j] <== pubkeys[i][j];
         }
@@ -101,19 +106,19 @@ template VerifyValidatorRight(nVals, nSiblings) {
     }
 
     
-    component validatorHashAddr = CalculateValidatorAddress();
+    component validatorHashAddr = CalculateAddress();
     for(i = 0; i < 32; i++) {
         validatorHashAddr.in[i] <== validatorHash[i];
     }
     validatorHashAddress <== validatorHashAddr.out;
 
-    component dataHashAddr = CalculateValidatorAddress();
+    component dataHashAddr = CalculateAddress();
     for(i = 0; i < 32; i++) {
         dataHashAddr.in[i] <== dataHash[i];
     }
     dataHashAddress <== dataHashAddr.out;
 
-    component blockHashAddr = CalculateValidatorAddress();
+    component blockHashAddr = CalculateAddress();
     for(i = 0; i < 32; i++) {
         blockHashAddr.in[i] <== blockHash[i];
     }

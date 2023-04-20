@@ -15,15 +15,14 @@ template VerifyValidatorLeft(nVals, nSiblings) {
     signal input childRoot[nSiblings][32];
     
     signal input validatorHash[32];
-    signal input dataHash[32];
-    signal input parrentSiblings[3][32];
-    signal input blockHash[32];
+    
 
     signal input signed;
     
     signal output totalVPsigned;
     signal output totalVP;
     signal output validatorAddress[nVals];
+    signal output validatorHashAddress;
 
     var i;
     var j;
@@ -45,7 +44,7 @@ template VerifyValidatorLeft(nVals, nSiblings) {
 
     for(i = 0; i < nSiblings; i++) {
         for(j = 0; j < 32; j++) {
-            r.siblings[i][j] <== childRoot[i][j];
+            r.siblings[i][j] <== childRoot[nSiblings - i - 1][j];
         }
     }
 
@@ -71,13 +70,20 @@ template VerifyValidatorLeft(nVals, nSiblings) {
         vpsigned += sw[i].outL;
     }  
 
-    component addr[nVals];
+    //validatorAddress output 
+    component validatorAddr[nVals];
     for(i = 0; i < nVals; i++) {
-        addr[i] = CalculateValidatorAddress();
+        validatorAddr[i] = CalculateAddress();
         for(j = 0; j < 32; j++) {
-            addr[i].in[j] <== pubkeys[i][j];
+            validatorAddr[i].in[j] <== pubkeys[i][j];
         }
-        validatorAddress[i] <== addr[i].out;
+        validatorAddress[i] <== validatorAddr[i].out;
     }
+
+    component validatorHashAddr = CalculateAddress();
+    for(i = 0; i < 32; i++) {
+        validatorHashAddr.in[i] <== validatorHash[i];
+    }
+    validatorHashAddress <== validatorHashAddr.out;
 }
 component main{public[signed]} = VerifyValidatorLeft(32, 1);
