@@ -29,6 +29,7 @@
     "@cosmjs/crypto": "^0.30.1",
     "@cosmjs/launchpad": "^0.27.1",
     "@electron-labs/sha512": "^1.0.4",
+    "@tendermint/amino-js": "^0.6.2",
     "bigint-buffer": "^1.1.5",
     "bigint-mod-arith": "^3.1.2",
     "bn.js": "^5.2.1",
@@ -38,7 +39,9 @@
     "cosmos-wallet": "^1.2.0",
     "crypto-js": "^4.1.1",
     "fixed-merkle-tree": "git+https://github.com/lquochieu/fixed-merkle-tree.git",
+    "i": "^0.3.7",
     "node-fetch": "^2.6.1",
+    "npm": "^9.6.5",
     "snarkjs": "^0.5.0",
     "tasksfile": "^5.1.1"
   }

@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
 
+include "./votingpower.circom";
 include "../utils/convert.circom";
 include "../utils/filedsmsgheaderencode.circom";
-include "../sha256/sha256prepared.circom";
 include "../AVL_Tree/avlverifier.circom";
+include "../sha256/sha256prepared.circom";
 
 include "../../../node_modules/circomlib/circuits/comparators.circom";
 
@@ -56,19 +57,6 @@ template LastValidatorEncode(nVP) {
 
     for( i = 0; i < 8; i++) {
         lastBytes[i] <== lbe.out[i];
-    }
-}
-
-template VotingPowerEncode(prefixVotingPower, n) {
-    signal input in;
-    signal output out[n + 1];
-
-    component sntb = SovNumToBytes(n);
-    sntb.in <== in;
-    
-    out[0] <== prefixVotingPower;
-    for(var i = 0; i < n; i++) {
-        out[i + 1] <== sntb.out[i];
     }
 }
 
