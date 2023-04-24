@@ -1,0 +1,87 @@
+Thu Apr 20 02:00:23 2023  [TRACE]: Start Initializing a b c A
+Thu Apr 20 02:00:23 2023  [TRACE]: Processing coefs
+Thu Apr 20 02:00:24 2023  [TRACE]: Calculating c
+Thu Apr 20 02:00:24 2023  [TRACE]: Initializing fft
+Thu Apr 20 02:00:24 2023  [TRACE]: Start iFFT A
+Thu Apr 20 02:00:24 2023  [TRACE]: a After ifft:
+Thu Apr 20 02:00:24 2023  [TRACE]: Start Shift A
+Thu Apr 20 02:00:24 2023  [TRACE]: a After shift:
+Thu Apr 20 02:00:24 2023  [TRACE]: Start FFT A
+Thu Apr 20 02:00:24 2023  [TRACE]: a After fft:
+Thu Apr 20 02:00:24 2023  [TRACE]: Start iFFT B
+Thu Apr 20 02:00:25 2023  [TRACE]: b After ifft:
+Thu Apr 20 02:00:25 2023  [TRACE]: Start Shift B
+Thu Apr 20 02:00:25 2023  [TRACE]: b After shift:
+Thu Apr 20 02:00:25 2023  [TRACE]: Start FFT B
+Thu Apr 20 02:00:25 2023  [TRACE]: b After fft:
+Thu Apr 20 02:00:25 2023  [TRACE]: Start iFFT C
+Thu Apr 20 02:00:25 2023  [TRACE]: c After ifft:
+Thu Apr 20 02:00:25 2023  [TRACE]: Start Shift C
+Thu Apr 20 02:00:26 2023  [TRACE]: c After shift:
+Thu Apr 20 02:00:26 2023  [TRACE]: Start FFT C
+Thu Apr 20 02:00:26 2023  [TRACE]: c After fft:
+Thu Apr 20 02:00:26 2023  [TRACE]: Start ABC
+Thu Apr 20 02:00:26 2023  [TRACE]: abc:
+Thu Apr 20 02:00:26 2023  [TRACE]: Start Multiexp H
+Thu Apr 20 02:00:30 2023  [TRACE]: Start Multiexp A
+Thu Apr 20 02:00:30 2023  [TRACE]: Start Multiexp B1
+Thu Apr 20 02:00:31 2023  [TRACE]: Start Multiexp B2
+Thu Apr 20 02:00:31 2023  [TRACE]: Start Multiexp C
+Thu Apr 20 06:41:57 2023  [TRACE]: Start Initializing a b c A
+Thu Apr 20 06:41:57 2023  [TRACE]: Processing coefs
+Thu Apr 20 06:41:57 2023  [TRACE]: Calculating c
+Thu Apr 20 06:41:57 2023  [TRACE]: Initializing fft
+Thu Apr 20 06:41:57 2023  [TRACE]: Start iFFT A
+Thu Apr 20 06:41:58 2023  [TRACE]: a After ifft:
+Thu Apr 20 06:41:58 2023  [TRACE]: Start Shift A
+Thu Apr 20 06:41:58 2023  [TRACE]: a After shift:
+Thu Apr 20 06:41:58 2023  [TRACE]: Start FFT A
+Thu Apr 20 06:41:58 2023  [TRACE]: a After fft:
+Thu Apr 20 06:41:58 2023  [TRACE]: Start iFFT B
+Thu Apr 20 06:41:58 2023  [TRACE]: b After ifft:
+Thu Apr 20 06:41:58 2023  [TRACE]: Start Shift B
+Thu Apr 20 06:41:58 2023  [TRACE]: b After shift:
+Thu Apr 20 06:41:58 2023  [TRACE]: Start FFT B
+Thu Apr 20 06:41:59 2023  [TRACE]: b After fft:
+Thu Apr 20 06:41:59 2023  [TRACE]: Start iFFT C
+Thu Apr 20 06:41:59 2023  [TRACE]: c After ifft:
+Thu Apr 20 06:41:59 2023  [TRACE]: Start Shift C
+Thu Apr 20 06:41:59 2023  [TRACE]: c After shift:
+Thu Apr 20 06:41:59 2023  [TRACE]: Start FFT C
+Thu Apr 20 06:42:00 2023  [TRACE]: c After fft:
+Thu Apr 20 06:42:00 2023  [TRACE]: Start ABC
+Thu Apr 20 06:42:00 2023  [TRACE]: abc:
+Thu Apr 20 06:42:00 2023  [TRACE]: Start Multiexp H
+Thu Apr 20 06:42:04 2023  [TRACE]: Start Multiexp A
+Thu Apr 20 06:42:04 2023  [TRACE]: Start Multiexp B1
+Thu Apr 20 06:42:04 2023  [TRACE]: Start Multiexp B2
+Thu Apr 20 06:42:04 2023  [TRACE]: Start Multiexp C
+Thu Apr 20 07:05:57 2023  [TRACE]: Start Initializing a b c A
+Thu Apr 20 07:05:57 2023  [TRACE]: Processing coefs
+Thu Apr 20 07:05:57 2023  [TRACE]: Calculating c
+Thu Apr 20 07:05:57 2023  [TRACE]: Initializing fft
+Thu Apr 20 07:05:57 2023  [TRACE]: Start iFFT A
+Thu Apr 20 07:05:57 2023  [TRACE]: a After ifft:
+Thu Apr 20 07:05:57 2023  [TRACE]: Start Shift A
+Thu Apr 20 07:05:57 2023  [TRACE]: a After shift:
+Thu Apr 20 07:05:57 2023  [TRACE]: Start FFT A
+Thu Apr 20 07:05:58 2023  [TRACE]: a After fft:
+Thu Apr 20 07:05:58 2023  [TRACE]: Start iFFT B
+Thu Apr 20 07:05:58 2023  [TRACE]: b After ifft:
+Thu Apr 20 07:05:58 2023  [TRACE]: Start Shift B
+Thu Apr 20 07:05:58 2023  [TRACE]: b After shift:
+Thu Apr 20 07:05:58 2023  [TRACE]: Start FFT B
+Thu Apr 20 07:05:59 2023  [TRACE]: b After fft:
+Thu Apr 20 07:05:59 2023  [TRACE]: Start iFFT C
+Thu Apr 20 07:05:59 2023  [TRACE]: c After ifft:
+Thu Apr 20 07:05:59 2023  [TRACE]: Start Shift C
+Thu Apr 20 07:05:59 2023  [TRACE]: c After shift:
+Thu Apr 20 07:05:59 2023  [TRACE]: Start FFT C
+Thu Apr 20 07:05:59 2023  [TRACE]: c After fft:
+Thu Apr 20 07:05:59 2023  [TRACE]: Start ABC
+Thu Apr 20 07:05:59 2023  [TRACE]: abc:
+Thu Apr 20 07:05:59 2023  [TRACE]: Start Multiexp H
+Thu Apr 20 07:06:04 2023  [TRACE]: Start Multiexp A
+Thu Apr 20 07:06:04 2023  [TRACE]: Start Multiexp B1
+Thu Apr 20 07:06:04 2023  [TRACE]: Start Multiexp B2
+Thu Apr 20 07:06:05 2023  [TRACE]: Start Multiexp C

@@ -90,6 +90,24 @@ template ValidatorEncode(nVP) {
     }
 }
 
+template CheckEmptyValidator() {
+    signal input pubkey[32];
+    signal input votingPower;
+    signal output out;
+
+    var i;
+    var check = 0;
+    
+    for(i = 0; i < 32; i++) {
+        check += pubkey[i];
+    }
+    check += votingPower;
+
+    component isEmpty= IsZero();
+    isEmpty.in <== check;
+
+    out <== isEmpty.out;
+}
 
 template ValidatorLeaf() {
     var nVP = 4;
@@ -105,8 +123,7 @@ template ValidatorLeaf() {
     var i;
     var j;
     var byteEnd = 128;
-    // 2^7; 2^14; 2^21
-    
+
     j = 1;
 
     for(i = 0; i < nVP - 1; i++) {
@@ -145,10 +162,15 @@ template ValidatorLeaf() {
         vh.in[56 + i] <== lve.lastBytes[i];
     }
 
+    component isEmpty = CheckEmptyValidator();
     for(i = 0; i < 32; i++) {
-        out[i] <== vh.out[i];
+        isEmpty.pubkey[i] <== pubkey[i];
     }
+    isEmpty.votingPower <== votingPower;
 
+    for(i = 0; i < 32; i++) {
+        out[i] <== vh.out[i] * (1 - isEmpty.out);
+    }
 }
 
 template CalculateValidatorHash(nValidators) {
@@ -174,6 +196,7 @@ template CalculateValidatorHash(nValidators) {
         for(j = 0; j < 32; j++) {
             r.in[i][j] <==  valLeafs[i].out[j];
         }
+        
     }
 
     for(i = 0; i < 32; i++) {

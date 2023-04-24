@@ -50,7 +50,8 @@ template CalculateRootFromSiblings(nSiblings) {
                 levels[i].child[j] <== levels[i+1].root[j];
             }
         }
-        
+        // log("siblings[i]", siblings[i][0], siblings[i][1], siblings[i][2], siblings[i][3], siblings[i][4], siblings[i][5], siblings[i][6], siblings[i][7]);
+        // log("levels", levels[i].root[0], levels[i].root[1], levels[i].root[2], levels[i].root[3], levels[i].root[4], levels[i].root[5], levels[i].root[6], levels[i].root[7]);
     }
 
     for(i = 0; i < 32; i++) {
@@ -88,8 +89,7 @@ template CalculateRootFromLeafs(nLeafs) {
             }
         }
 
-        parrent = HashInner(32);
-        log("parrent");
+        parrent = HashChilds(32);
         for(i = 0; i < 32; i++) {
             parrent.L[i] <== left.out[i];
             parrent.R[i] <== right.out[i];
