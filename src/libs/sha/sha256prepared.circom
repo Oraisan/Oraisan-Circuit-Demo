@@ -90,3 +90,43 @@ template Sha256Prepared(nBlocks) {
         out[i] <== bitsToBytes[i].out;
     }
 }
+
+template SHA256Message(nBytes) {
+    signal input in[nBytes];
+    signal input length;
+    signal output out[32];
+
+    var i;
+    var nBlocks;
+
+
+    nBlocks = ((nBytes + 8)\64)+1;
+
+    component pbot = PutBytesOnTop(nBytes, 1);
+    
+    for(i = 0; i < nBytes; i++) {
+        pbot.s1[i] <== in[i];
+    }
+    pbot.s2[0] <== 128;
+    pbot.idx <== length;
+
+    component lb =  LastBytesSHA256();
+    lb.in <== length * 8;
+
+    component hp = Sha256Prepared(nBlocks);
+    for(i = 0; i < nBytes + 1; i++) {
+        hp.in[i] <== pbot.out[i];
+    }
+
+    for(i = nBytes + 1; i < 64 * nBlocks - 8; i++) {
+        hp.in[i] <== 0;
+    }
+
+    for(i = 0; i < 8; i++) {
+        hp.in[i + 64 * nBlocks - 8] <== lb.out[i];
+    }
+
+    for(i = 0; i < 32; i++) {
+        out[i] <== hp.out[i];
+    }
+}

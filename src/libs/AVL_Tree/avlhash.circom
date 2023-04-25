@@ -1,6 +1,6 @@
 pragma circom 2.0.0;
 
-include "../sha256/sha256standard.circom";
+include "../sha/sha256standard.circom";
 include "../../../node_modules/circomlib/circuits/comparators.circom";
 include "../../../node_modules/circomlib/circuits/switcher.circom";
 

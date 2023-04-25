@@ -3,39 +3,44 @@ include "../../../node_modules/circomlib/circuits/bitify.circom";
 include "../../../node_modules/circomlib/circuits/comparators.circom";
 include "convert.circom";
 include "fieldsencode.circom";
+include "shiftbytes.circom";
 
-template EncodeTimestamp(prefix, prefixSeconds, prefixNanos, nSeconds, nNanos) {
-    
-    // var nSeconds = 5;
-    // var nNanos = 5;
+template EncodeTimestamp(prefix, prefixSeconds, prefixNanos) {
+    signal input seconds;
+    signal input nanos;
+
+    signal output out[14];
+    signal output length;
     
     var i;
     var idx;
 
-    signal input seconds;
-    signal input nanos;
-
-    signal output out[nSeconds + nNanos + 4];
-    
-    component bs = EncodeTimeUnit(prefixSeconds, nSeconds);
+    component bs = EncodeTimeUnit(prefixSeconds, 5);
     bs.timeUnit <== seconds;
 
 
-    component bn = EncodeTimeUnit(prefixNanos, nNanos);
+    component bn = EncodeTimeUnit(prefixNanos, 5);
     bn.timeUnit <== nanos;
 
+    component pbot = PutBytesOnTop(6, 6);
+    for(i = 0; i < 6; i++) {
+        pbot.s1[i] <== bs.out[i];
+    }
+
+    pbot.idx <== bs.length;
+
+    for(i = 0; i < 6; i++) {
+        pbot.s2[i] <== bn.out[i];
+    }
+
     out[0] <== prefix;
-    out[1] <== nSeconds + nNanos + 2;
-    idx = 2;
-
-    for(i = 0; i < 1 + nSeconds; i++) {
-        out[i + idx] <== bs.out[i];
+    out[1] <== bs.length + bn.length;
+    
+    for(var i = 0; i < 12; i++) {
+        out[i + 2] <== pbot.out[i];
     }
-    idx += 1 + nSeconds;
 
-    for(i = 0; i < 1 + nNanos; i++) {
-        out[i + idx] <== bn.out[i];
-    }
+    length <== bs.length + bn.length + 2;
 }
 
 template EncodeBlockID(prefix, prefixHash, prefixParts, prefixPartsHash, prefixPartsTotal) {
@@ -45,6 +50,8 @@ template EncodeBlockID(prefix, prefixHash, prefixParts, prefixPartsHash, prefixP
     signal input partsHash[32];
 
     signal output out[74];
+    signal output length;
+
     var i;
     var j;
 
@@ -72,12 +79,15 @@ template EncodeBlockID(prefix, prefixHash, prefixParts, prefixPartsHash, prefixP
     for(i = 0; i < 38; i++) {
         out[i + 36] <== ps.out[i];
     }
+
+    length <== 74;
 }
 
 template EncodeRound(prefix, n) {
     signal input round;
     signal output out[n + 1];
-    
+    signal output length;
+
     var i;
 
     //prefix = 0x11
@@ -90,13 +100,16 @@ template EncodeRound(prefix, n) {
     for(i = 0; i < n; i++) {
         out[i+1] <== ntb.out[i];
     }
+    length <== n + 1;
 }
 
 template EncodeHeight(prefix, n) {
     
     signal input height;
+
     signal output out[n + 1];
-    
+    signal output length;
+
     var i;
 
     //prefix = 0x11
@@ -109,6 +122,7 @@ template EncodeHeight(prefix, n) {
     for(i = 0; i < n; i++) {
         out[i+1] <== ntb.out[i];
     }
+    length <== n + 1;
 }
 
 template EncodeType(prefix) {
@@ -117,8 +131,10 @@ template EncodeType(prefix) {
     signal input type;
     
     signal output out[2];
+    signal output length;
 
     out[0] <== prefix;
     out[1] <== type;
+    length <== 2;
 }
 

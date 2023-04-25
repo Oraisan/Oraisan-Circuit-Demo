@@ -3,7 +3,7 @@ pragma circom 2.0.0;
 include "../../../libs/validators/signaturesverifier.circom";
 include "../../../libs/utils/address.circom";
 
-template VerifySignature(nChainID, nSeconds, nNanos) {
+template VerifySignature(nChainID) {
     // signal input type;
     // signal input chainID[nChainID];
     signal input height; 
@@ -29,7 +29,7 @@ template VerifySignature(nChainID, nSeconds, nNanos) {
     // chainID = "Oraichain"
     var chainID[nChainID] = [79, 114, 97, 105, 99, 104, 97, 105, 110];
 
-    component sv = SignatureVerifier(nChainID, nSeconds, nNanos);
+    component sv = SignatureVerifier(nChainID);
     sv.type <== type;
 
     for(i = 0; i < nChainID; i++) {
@@ -81,4 +81,4 @@ template VerifySignature(nChainID, nSeconds, nNanos) {
     blockhashAddress <== blockAddr.out;
 }
 
-component main{public[height, blockTime]} = VerifySignature(9, 5, 4);
+component main{public[height, blockTime]} = VerifySignature(9);

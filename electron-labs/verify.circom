@@ -11,8 +11,6 @@ include "../node_modules/circomlib/circuits/gates.circom";
 
 
 template Ed25519Verifier(n) {
-  
-  
   signal input msg[n];
   
   signal input A[256];
