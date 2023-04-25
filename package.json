@@ -12,7 +12,7 @@
     "verifier-contract": "snarkjs zkesv ./src/block/validatorSet/validatorsLeft/*.zkey ./src/block/validatorSet/validatorsLeft/verifier.sol",
     "gen-proof": "snarkjs g16p ./src/block/signature/msg_110/circuit_final.zkey ./src/block/signature/msg_110/witness.wtns ./src/block/signature/msg_110/proof.json ./src/block/signature/msg_110/public.json",
     "gen-proof-rapid": "../rapidsnark/build/prover ./src/block/signature/msg_110/circuit_final.zkey ./src/block/signature/msg_110/witness.wtns ./src/block/signature/msg_110/proof.json ./src/block/signature/msg_110/public.json",
-    "get-proof-contract": "snarkjs zkey export soliditycalldata ./src/block/signature/msg_111/public.json ./src/block/signature/msg_111/proof.json",
+    "get-proof-contract": "snarkjs zkey export soliditycalldata ./src/block/signature/msg_110/public.json ./src/block/signature/msg_110/proof.json",
     "task": "node ./tasksfile.js"
   },
   "repository": {
