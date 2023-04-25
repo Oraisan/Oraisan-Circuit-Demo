@@ -4,7 +4,7 @@ include "./hashblockelements.circom";
 include "../utils/filedsblockheaderencode.circom";
 include "../AVL_Tree/avlverifier.circom";
 
-template CalculateBlockHash(nHeight, nSeconds, nNanos) {
+template CalculateBlockHash(nHeight) {
     // signal input versionBlock;
     // signal input versionApp;
     // signal input chainID;
@@ -30,7 +30,7 @@ template CalculateBlockHash(nHeight, nSeconds, nNanos) {
     var i;
     var j;
     
-    component h = HashElementsBlock(nHeight, nSeconds, nNanos);
+    component h = HashElementsBlock(nHeight);
     for(i = 0; i < 32; i++) {
         h.versionHash[i] <== versionHash[i];
         h.chainIDHash[i] <== chainIDHash[i];

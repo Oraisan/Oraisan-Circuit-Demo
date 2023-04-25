@@ -3,62 +3,12 @@ pragma circom 2.0.0;
 
 include "./votingpower.circom";
 include "../utils/convert.circom";
+include "../utils/shiftbytes.circom";
 include "../utils/filedsmsgheaderencode.circom";
 include "../AVL_Tree/avlverifier.circom";
-include "../sha256/sha256prepared.circom";
+include "../sha/sha256prepared.circom";
 
 include "../../../node_modules/circomlib/circuits/comparators.circom";
-
-
-template LastValidatorEncode(nVP) {
-    signal input votingPower;
-    signal input in[nVP];
-
-    signal output out[nVP + 1];
-    signal output lastBytes[8];
-
-    signal byteEndIndex[nVP + 1];
-
-    var i;
-    var j;
-    var len = 39;
-    var byteEnd = 128;
-    var byteVPIndex[nVP];
-
-    j = 1;
-
-    for(i = 0; i < nVP; i++) {
-        j *= 128;
-        byteVPIndex[i] = j;
-    }
-
-    component idxVP[nVP];
-    component sw[nVP];
-
-    byteEndIndex[0] <== 0;
-    for(i = 0; i < nVP; i++) {
-        idxVP[i] = GreaterEqThan(nVP * 8);
-        idxVP[i].in[0] <== votingPower;
-        idxVP[i].in[1] <== byteVPIndex[i];
-    
-        byteEndIndex[i + 1] <== i == 0 ? (1 - idxVP[i].out) : (1 - idxVP[i].out) * idxVP[i - 1].out;
-        
-        sw[i] = SwitchSovByte();
-        sw[i].xor <== idxVP[i].out;
-        sw[i].in <== in[i];
-
-        out[i] <== sw[i].out * (1 - byteEndIndex[i]) + byteEndIndex[i] * byteEnd;
-        len += idxVP[i].out;
-    }
-    out[nVP] <== byteEndIndex[nVP] * byteEnd;
-
-    component lbe = LastBytesSHA256();
-    lbe.in <== len * 8;
-
-    for( i = 0; i < 8; i++) {
-        lastBytes[i] <== lbe.out[i];
-    }
-}
 
 template ValidatorEncode(nVP) {
     var prefixValidator = 10;
@@ -131,17 +81,30 @@ template ValidatorLeaf() {
         byteVPIndex[i] <== j;
     }
 
+    // encode validator (validatorHash, votingPower)
     component ve = ValidatorEncode(nVP);
     for(i = 0; i < 32; i++) {
         ve.pubkey[i] <== pubkey[i];
     }
     ve.votingPower <== votingPower;
 
-    component lve = LastValidatorEncode(nVP);
-    lve.votingPower <== votingPower;
+    // process SovByte Voting Power
+    component tsb = TrimSovBytes(nVP);
     for(i = 0; i < nVP; i++) {
-        lve.in[i] <== ve.out[37 + i];
+        tsb.in[i] <== ve.out[37 + i];
     }
+
+    // Insert last byte signal beforeHash
+    component pbot = PutBytesOnTop(nVP, 1);
+    for(i = 0; i < nVP; i++) {
+        pbot.s1[i] <== tsb.out[i];
+    }
+    pbot.s2[0] <== 128;
+    pbot.idx <== tsb.length;
+
+    //Calculate last byte before hash
+    component lbe = LastBytesSHA256();
+    lbe.in <== (38 + tsb.length) * 8;
 
     component vh = Sha256Prepared(1);
     vh.in[0] <== 0;
@@ -151,7 +114,7 @@ template ValidatorLeaf() {
     }
 
     for(i = 0; i < nVP + 1; i++) {
-        vh.in[i + 38] <== lve.out[i];
+        vh.in[i + 38] <== pbot.out[i];
     }
 
     for(i = 39 + nVP; i < 56; i++) {
@@ -159,7 +122,8 @@ template ValidatorLeaf() {
     }
 
     for(i = 0; i < 8; i++) {
-        vh.in[56 + i] <== lve.lastBytes[i];
+        vh.in[56 + i] <== lbe.out[i];
+        
     }
 
     component isEmpty = CheckEmptyValidator();

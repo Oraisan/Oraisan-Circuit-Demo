@@ -2,7 +2,7 @@
 pragma circom 2.0.0;
 include "../../libs/block/calculateblockhash.circom";
 
-template VerifyBlockHash(nHeight, nSeconds, nNanos) {
+template VerifyBlockHash(nHeight) {
     signal input versionHash[32];
     signal input chainIDHash[32];
 
@@ -26,7 +26,7 @@ template VerifyBlockHash(nHeight, nSeconds, nNanos) {
     var i;
     var j;
     
-    component h = CalculateBlockHash(nHeight, nSeconds, nNanos);
+    component h = CalculateBlockHash(nHeight);
 
     for(i = 0; i < 32; i++) {
         h.versionHash[i] <== versionHash[i];
@@ -55,4 +55,4 @@ template VerifyBlockHash(nHeight, nSeconds, nNanos) {
     }
 
 }
-component main{public[chainIDHash, height, time, dataHash, validatorsHash]} = VerifyBlockHash(4, 5, 5);
+component main{public[chainIDHash, height, time, dataHash, validatorsHash]} = VerifyBlockHash(4);

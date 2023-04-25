@@ -2,12 +2,14 @@
 pragma circom 2.0.0;
 
 include "../utils/filedsmsgheaderencode.circom";
+include "../utils/shiftbytes.circom";
 
-template MsgEncode(nChainID, nSeconds, nNanos) {
+template MsgEncode(nChainID) {
     var prefixTimestamp = 42;
     var prefixSeconds = 8;
     var prefixNanos = 16;
-    var nMsgBytes = 92 + nChainID + nSeconds + nNanos;
+    var prefixChainID = 50;
+    var nMsgBytes = 102 + nChainID;
 
     var i;
     var j;
@@ -21,15 +23,12 @@ template MsgEncode(nChainID, nSeconds, nNanos) {
     signal input partsHash[32];
     signal input seconds;
     signal input nanos;
-    // signal input chainID[nChainID];
     signal output out[nMsgBytes];
-
-    component mheWT = MsgHeaderEncodeWithoutTimestamp(nMsgBytes, nChainID, nSeconds, nNanos);        
+    signal output length;
+    
+    // encode the fields before timestamp and chainID 
+    component mheWT = MsgHeaderEncodeBeforeTimestamp(85);        
     mheWT.type <== type;
-
-    for(i = 0; i < nChainID; i++) {
-        mheWT.chainID[i] <== chainID[i];
-    }
 
     mheWT.height <== height;
     for(i = 0; i < 32; i++) {
@@ -39,27 +38,46 @@ template MsgEncode(nChainID, nSeconds, nNanos) {
     }
     mheWT.partsTotal <== partsTotal;
 
-    for(i = 0; i < nMsgBytes - nSeconds - nNanos - nChainID - 6; i++) {
-            out[i] <== mheWT.msg[i];
-    }
-
-    component mhe = EncodeTimestamp(prefixTimestamp, prefixSeconds, prefixNanos, nSeconds, nNanos);
+    // encode timestamp
+    component mhe = EncodeTimestamp(prefixTimestamp, prefixSeconds, prefixNanos);
     mhe.seconds <== seconds;
     mhe.nanos <== nanos;
-        
-    idx = nMsgBytes - nSeconds - nNanos - nChainID - 6;
-    for(i = 0; i < nNanos + nSeconds + 4; i++) {
-        out[i + idx] <== mhe.out[i];
-    }
-
-    idx += nSeconds + nNanos + 4;
-    for(i = 0; i < nChainID + 2; i++) {
-        out[i + idx] <== mheWT.msg[i + idx];
+    
+    //because of timestamp has length range from 0 to 10 bytes so i need process it before use sha512 
+    component putIDOnTop = PutBytesOnTop(14, nChainID + 2);
+    for(i = 0; i < 14; i++) {
+        putIDOnTop.s1[i] <== mhe.out[i];
     }
     
+    putIDOnTop.idx <== mhe.length;
+
+
+    putIDOnTop.s2[0] <== prefixChainID;
+    putIDOnTop.s2[1] <== nChainID;
+    for(i = 0; i < nChainID; i++) {
+        putIDOnTop.s2[i + 2] <== chainID[i];
+    }
+
+    //output
+    // output length
+    out[0] <== 87 + mhe.length + nChainID;
+
+    //output fields encoded before timestamp and chainID
+    for(i = 0; i < 85; i++) {
+            out[i + 1] <== mheWT.msg[i];
+    }
+    
+    //output timestamp and chainID encoded
+    for(i = 0; i < 14 + nChainID + 2; i++) {
+        out[i + 86] <== putIDOnTop.out[i];
+    }
+
+    //output msg length
+    length <== 88 + mhe.length + nChainID;
+
 }
 
-template MsgHeaderEncodeWithoutTimestamp(nMsgBytes, nChainID, nSeconds, nNanos) {
+template MsgHeaderEncodeBeforeTimestamp(nMsgBytes) {
     var nHeight = 8;
 
     var prefixType = 8;
@@ -69,25 +87,21 @@ template MsgHeaderEncodeWithoutTimestamp(nMsgBytes, nChainID, nSeconds, nNanos) 
     var prefixParts = 18;
     var prefixPartsTotal = 8;
     var prefixPartsHash = 18;
-    var prefixChainID = 50;
+    // var prefixChainID = 50;
 
     var i;
     var j;
     var idx;
 
     signal input type;
-    signal input chainID[nChainID];
     signal input height;
     signal input blockHash[32];
     signal input partsTotal;
     signal input partsHash[32];
     signal output msg[nMsgBytes];
 
-    // EncodeLengthMsg(8)
-    // len = 110
-    msg[0] <== nMsgBytes - 1;
-    msg[1] <== prefixType;
-    msg[2] <== type;
+    msg[0] <== prefixType;
+    msg[1] <== type;
 
     component eHeight = EncodeHeight(prefixHeight, nHeight);
     eHeight.height <== height;
@@ -103,7 +117,7 @@ template MsgHeaderEncodeWithoutTimestamp(nMsgBytes, nChainID, nSeconds, nNanos) 
     }
     
 
-    idx = 3;
+    idx = 2;
     for(i = 0; i < 1 + nHeight; i++) {
         msg[i + idx] <== eHeight.out[i];
     }
@@ -113,18 +127,5 @@ template MsgHeaderEncodeWithoutTimestamp(nMsgBytes, nChainID, nSeconds, nNanos) 
         msg[i +idx] <== eBlockID.out[i];
     }
     idx += 74;
-
-    for(i = 0; i < 4 + nSeconds + nNanos; i++) {
-        msg[i + idx] <== 0;
-    }
-    idx += 4 + nSeconds + nNanos;
-
-    msg[idx] <== prefixChainID;
-    msg[idx + 1] <== nChainID;
-
-    for(i = 0; i < nChainID; i++) {
-        msg[i + idx + 2] <== chainID[i];
-    }
-    idx + 11 === nMsgBytes;
 }
 

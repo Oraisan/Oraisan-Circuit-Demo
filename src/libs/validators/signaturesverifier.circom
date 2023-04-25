@@ -2,12 +2,13 @@
 pragma circom 2.0.0;
 
 include "./msgheaderencode.circom";
+include "./verify.circom";
 include "../utils/convert.circom";
-include "../../../electron-labs/verify.circom";
+include "../utils/shiftbytes.circom";
 include "../../../node_modules/circomlib/circuits/comparators.circom";
 
-template SignatureVerifier(nChainID, nSeconds, nNanos) {
-    var nBytes = 92 + nChainID + nSeconds + nNanos;
+template SignatureVerifier(nChainID) {
+    var nBytes = 102 + nChainID;
 
     signal input type;
     signal input chainID[nChainID];
@@ -39,7 +40,7 @@ template SignatureVerifier(nChainID, nSeconds, nNanos) {
     isTimeLesser.in[1] <== blockTime + 10 * 1000000000;
     isTimeLesser.out === 1;
 
-    component msg = MsgEncode(nChainID, nSeconds, nNanos);
+    component msg = MsgEncode(nChainID);
     msg.type <== type;
 
     for(i = 0; i < nChainID; i++) {
@@ -61,53 +62,17 @@ template SignatureVerifier(nChainID, nSeconds, nNanos) {
     msg.seconds <== sigTimeSeconds;
     msg.nanos <== sigTimeNanos;
 
-    component msg2Bits[nBytes];
-    for(i = 0; i < nBytes; i++) {
-        msg2Bits[i] = BytesToBits(8);
-        msg2Bits[i].in <== msg.out[i];
-    }
-
-    component pb2Bits[32];
-    for(i = 0; i < 32; i++) {
-        pb2Bits[i] = BytesToBits(8);
-        pb2Bits[i].in <== pubKeys[i];
-    }
-
-    component r8ToBits[32];
-    for(i = 0; i < 32; i++) {
-        r8ToBits[i] = BytesToBits(8);
-        r8ToBits[i].in <== R8[i];
-    }
-
-    component S2Bits[32];
-    for(i = 0; i < 32; i++) {
-        S2Bits[i] = BytesToBits(8);
-        S2Bits[i].in <== S[i];
-    }
-
-    component v = Ed25519Verifier(8 * nBytes);
+    component v = Ed25519Verifier(nBytes);
 
     for(i = 0; i < nBytes; i++) {
-        for(j = 0; j < 8; j++) {
-            v.msg[i * 8 + j] <== msg2Bits[i].out[j];
-        }
+        v.msg[i] <== msg.out[i];
     }
+    v.length <== msg.length;
 
     for(i = 0; i < 32; i++) {
-        for(j = 0; j < 8; j++) {
-            v.A[i * 8 + j] <== pb2Bits[i].out[j];
-            v.R8[i * 8 + j] <== r8ToBits[i].out[j];
-        }
-    }
-
-    for(i = 0; i < 31; i++) {
-        for(j = 0; j < 8; j++) {
-            v.S[i * 8 + j] <== S2Bits[i].out[j];
-        }
-    }
-
-    for(i = 0; i < 7; i++) {
-        v.S[248 + i] <== S2Bits[31].out[i];
+        v.A[i] <== pubKeys[i];
+        v.R8[i] <== R8[i];
+        v.S[i] <== S[i];
     }
 
     for(i = 0; i < 4; i++) {

@@ -49,3 +49,4 @@ template CheckVotingPower(nVals) {
 
     out <== rs.out;
 }
+

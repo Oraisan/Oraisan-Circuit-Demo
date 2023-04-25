@@ -2,8 +2,8 @@
 pragma circom 2.0.0;
 include "../avlverifier.circom";
 include "../avlhash.circom";
-include "../../sha256/sha256standard.circom";
-include "../../sha256/sha256prepared.circom";
+include "../../sha/sha256standard.circom";
+include "../../sha/sha256prepared.circom";
 include "../../utils/convert.circom";
 
 template VerifyRoot(nLeafs) {
@@ -114,6 +114,7 @@ template testHash(n) {
         out2.in[i] <== in1[i];
     }
     out2.in[n] <== 128;
+    
     for(var i = n + 1; i < 56; i++) {
         out2.in[i] <== 0;
     }
