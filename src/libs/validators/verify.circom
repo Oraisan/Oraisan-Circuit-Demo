@@ -172,13 +172,15 @@ template CalculateAddRH(nBytes) {
     for(i = 0; i < 64; i++) {
         hashBits[i] = BytesToBits(8);
         hashBits[i].in <== hash.out[i];
+        
     }
 
     component bitModulus = ModulusWith252c(512);
     for (i=0; i<64; i+=1) {
         for(j=0; j<8; j++) {
-        bitModulus.in[i * 8 + j] <== hashBits[i].out[7-j];
+        bitModulus.in[i * 8 + j] <== hashBits[i].out[j];
         }
+        // log("new hash", i, hashBits[i].out[7], hashBits[i].out[6], hashBits[i].out[5], hashBits[i].out[4], hashBits[i].out[3], hashBits[i].out[2], hashBits[i].out[1], hashBits[i].out[0]);
     }
 
     component pMul2 = ScalarMul();
@@ -293,65 +295,65 @@ template PointEqual() {
     out <== and2[1].out;
 }
 
-// template HashValidatorMSG(nBytes) {
-//     signal input msg[nBytes];
-//     signal input length;
+template HashValidatorMSG(nBytes) {
+    signal input msg[nBytes];
+    signal input length;
 
-//     signal input A[32];
-//     signal input R8[32];
+    signal input A[32];
+    signal input R8[32];
     
-//     signal output out[64];
+    signal output out[64];
 
-//     var i;
+    var i;
 
-//     component hmsg = SHA512Message(nBytes + 64);
-//     for(i = 0; i < 32; i++) {
-//         hmsg.in[i] <== R8[i];
-//         hmsg.in[i + 32] <== A[i];
-//     }
+    component hmsg = SHA512Message(nBytes + 64);
+    for(i = 0; i < 32; i++) {
+        hmsg.in[i] <== R8[i];
+        hmsg.in[i + 32] <== A[i];
+    }
 
-//     for(i = 0; i < nBytes; i++) {
-//         hmsg.in[i + 64] <== msg[i];
-//     }
+    for(i = 0; i < nBytes; i++) {
+        hmsg.in[i + 64] <== msg[i];
+    }
     
-//     hmsg.length <== length + 64;
+    hmsg.length <== length + 64;
 
-//     for(i = 0; i < 64; i++) {
-//         out[i] <== hmsg.out[i];
-//     }
-//     // var j;
-//     // var lenHash = 512 + length * 8;
+    for(i = 0; i < 64; i++) {
+        out[i] <== hmsg.out[i];
+    }
+    // var j;
+    // var lenHash = 512 + length * 8;
 
-//     // component pbot = PutBytesOnTop(nBytes, 1);
+    // component pbot = PutBytesOnTop(nBytes, 1);
     
-//     // for(i = 0; i < nBytes; i++) {
-//     //     pbot.s1[i] <== msg[i];
-//     // }
-//     // pbot.s2[0] <== 128;
-//     // pbot.idx <== length;
+    // for(i = 0; i < nBytes; i++) {
+    //     pbot.s1[i] <== msg[i];
+    // }
+    // pbot.s2[0] <== 128;
+    // pbot.idx <== length;
 
-//     // component lb =  LastBytesSHA512();
-//     // lb.in <== lenHash;
+    // component lb =  LastBytesSHA512();
+    // lb.in <== lenHash;
 
-//     // component hp = Sha512Prepared(2);
-//     // for(i = 0; i < 32; i++) {
-//     //     hp.in[i] <== R8[i];
-//     //     hp.in[i + 32] <== A[i];
-//     // }
+    // component hp = Sha512Prepared(2);
+    // for(i = 0; i < 32; i++) {
+    //     hp.in[i] <== R8[i];
+    //     hp.in[i + 32] <== A[i];
+    // }
 
-//     // for(i = 0; i < nBytes + 1; i++) {
-//     //     hp.in[i + 64] <== pbot.out[i];
-//     // }
+    // for(i = 0; i < nBytes + 1; i++) {
+    //     hp.in[i + 64] <== pbot.out[i];
+    // }
 
-//     // for(i = 65 + nBytes; i < 240; i++) {
-//     //     hp.in[i] <== 0;
-//     // }
+    // for(i = 65 + nBytes; i < 240; i++) {
+    //     hp.in[i] <== 0;
+    // }
 
-//     // for(i = 0; i < 16; i++) {
-//     //     hp.in[i + 240] <== lb.out[i];
-//     // }
+    // for(i = 0; i < 16; i++) {
+    //     hp.in[i + 240] <== lb.out[i];
+    // }
 
-//     // for(i = 0; i < 64; i++) {
-//     //     out[i] <== hp.out[i];
-//     // }
-// }
+    // for(i = 0; i < 64; i++) {
+    //     out[i] <== hp.out[i];
+    // }
+}

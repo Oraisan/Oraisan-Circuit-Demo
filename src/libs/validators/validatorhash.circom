@@ -94,37 +94,22 @@ template ValidatorLeaf() {
         tsb.in[i] <== ve.out[37 + i];
     }
 
-    // Insert last byte signal beforeHash
-    component pbot = PutBytesOnTop(nVP, 1);
-    for(i = 0; i < nVP; i++) {
-        pbot.s1[i] <== tsb.out[i];
-    }
-    pbot.s2[0] <== 128;
-    pbot.idx <== tsb.length;
-
     //Calculate last byte before hash
     component lbe = LastBytesSHA256();
     lbe.in <== (38 + tsb.length) * 8;
 
-    component vh = Sha256Prepared(1);
+    component vh = SHA256Message(38 + nVP);
     vh.in[0] <== 0;
 
     for(i = 0; i < 37; i++) {
         vh.in[i + 1] <== ve.out[i];
     }
 
-    for(i = 0; i < nVP + 1; i++) {
-        vh.in[i + 38] <== pbot.out[i];
+    for(i = 0; i < nVP; i++) {
+        vh.in[i + 38] <== tsb.out[i];
     }
 
-    for(i = 39 + nVP; i < 56; i++) {
-        vh.in[i] <== 0;
-    }
-
-    for(i = 0; i < 8; i++) {
-        vh.in[56 + i] <== lbe.out[i];
-        
-    }
+    vh.length <== 38 + tsb.length;
 
     component isEmpty = CheckEmptyValidator();
     for(i = 0; i < 32; i++) {

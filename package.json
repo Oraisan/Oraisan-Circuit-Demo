@@ -7,12 +7,12 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "snarkjs powersoftau new bn128 22 ./ptau/powersOfTau28_hez_final_22.ptau -v",
     "circom": "circom ./src/block/signature/*.circom --r1cs --wasm",
-    "zkey-signature": "snarkjs g16s ./src/block/validatorSet/validatorsRight/*.r1cs ./ptau/powersOfTau28_hez_final_22.ptau ./src/block/validatorSet/validatorsRight/circuit_final.zkey",
+    "zkey-signature": "snarkjs g16s ./src/block/validatorSet/validatorsLeft/*.r1cs ./ptau/powersOfTau28_hez_final_22.ptau ./src/block/validatorSet/validatorsLeft/circuit_final.zkey",
     "zkey-encode-message": "snarkjs g16s ./test/message/*.r1cs ./ptau/powersOfTau28_hez_final_13.ptau ./test/message/circuit_final.zkey",
-    "verifier-contract": "snarkjs zkesv ./src/block/validatorSet/validatorsLeft/*.zkey ./src/block/validatorSet/validatorsLeft/verifier.sol",
+    "verifier-contract": "snarkjs zkesv ./src/block/signature/*.zkey ./src/block/signature/verifier.sol",
     "gen-proof": "snarkjs g16p ./src/block/signature/msg_110/circuit_final.zkey ./src/block/signature/msg_110/witness.wtns ./src/block/signature/msg_110/proof.json ./src/block/signature/msg_110/public.json",
-    "gen-proof-rapid": "../rapidsnark/build/prover ./src/block/signature/msg_110/circuit_final.zkey ./src/block/signature/msg_110/witness.wtns ./src/block/signature/msg_110/proof.json ./src/block/signature/msg_110/public.json",
-    "get-proof-contract": "snarkjs zkey export soliditycalldata ./src/block/signature/msg_110/public.json ./src/block/signature/msg_110/proof.json",
+    "gen-proof-rapid": "../rapidsnark/build/prover ./src/block/signature/circuit_final.zkey ./src/block/signature/witness.wtns ./src/block/signature/proof.json ./src/block/signature/public.json",
+    "get-proof-contract": "snarkjs zkey export soliditycalldata ./src/block/signature/public.json ./src/block/signature/proof.json",
     "task": "node ./tasksfile.js"
   },
   "repository": {

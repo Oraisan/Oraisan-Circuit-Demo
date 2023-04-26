@@ -6,8 +6,11 @@ include "../validatorhash.circom";
 include "../verify.circom";
 include "../../AVL_Tree/avlhash.circom";
 include "../../utils/address.circom";
+include "../../utils/convert.circom";
+include "../../../../electron-labs/verify.circom";
 include "../../../../node_modules/circomlib/circuits/bitify.circom";
 include "../../../../node_modules/@electron-labs/sha512/circuits/sha512/sha512.circom";
+
 // template VerifyEncodeVP() {
 //     signal input votingPower;
 
@@ -155,7 +158,7 @@ template VerifyHashMSG() {
         r8ToBits[i].in <== R8[i];
     }
 
-    component hash = Sha512(888  -16 + 256 + 256);
+    component hash = Sha512(888  - 16 + 256 + 256);
     for (i=0; i<32; i+=1) {
         for(j=0; j<8; j++) {
             hash.in[i * 8 + j] <== r8ToBits[i].out[7-j];
@@ -175,9 +178,102 @@ template VerifyHashMSG() {
         for (var j = 0; j < 8; j++) {
             bitsToBytes[i].in[7-j] <== hash.out[i*8+j];
         }
-        log(i, hmsg.out[i]);
         hmsg.out[i] === bitsToBytes[i].out;
     }
 }
 
-component main = VerifyHashMSG();
+template VerifyAddRH() {
+    signal input msg[111];
+    signal input length;
+
+    signal input pubKeys[32];
+    signal input R8[32];
+    
+    signal input PointA[4][3];
+    signal input PointR[4][3];
+
+    var i;
+    var j;
+
+    // component rMsg[111];
+    // for(i = 0; i < 111; i++){
+    //     rMsg[i] = ReverseByte();
+    //     rMsg[i].in <== msg[i];
+    // }
+
+    // component rPubKeys[32];
+    // for(i = 0; i < 32; i++){
+    //     rPubKeys[i] = ReverseByte();
+    //     rPubKeys[i].in <== pubKeys[i];
+    // }
+
+    // component rR8[32];
+    // for(i = 0; i < 32; i++){
+    //     rR8[i] = ReverseByte();
+    //     rR8[i].in <== R8[i];
+    // }
+
+    component cAddRH = CalculateAddRH(111);
+    for(i = 0; i < 111; i++) {
+        cAddRH.msg[i] <== msg[i];
+    }
+    cAddRH.length <== 111;
+    
+    for(i = 0; i < 32; i++) {
+        cAddRH.A[i] <== pubKeys[i];
+        cAddRH.R8[i] <== R8[i];
+    }
+
+    for(i = 0; i < 4; i++) {
+        for(j = 0; j < 3; j++) {
+            cAddRH.PointA[i][j] <== PointA[i][j];
+            cAddRH.PointR[i][j] <== PointR[i][j];
+        }
+    }
+
+    component msg2Bits[111];
+    for(i = 0; i < 111; i++) {
+        msg2Bits[i] = BytesToBits(8);
+        msg2Bits[i].in <== msg[i];
+    }
+
+    component pb2Bits[32];
+    for(i = 0; i < 32; i++) {
+        pb2Bits[i] = BytesToBits(8);
+        pb2Bits[i].in <== pubKeys[i];
+    }
+
+    component r8ToBits[32];
+    for(i = 0; i < 32; i++) {
+        r8ToBits[i] = BytesToBits(8);
+        r8ToBits[i].in <== R8[i];
+    }
+
+    component cAddRH1 = CalculateAddRH1(888);
+    for(i = 0; i < 111; i++) {
+        for(j = 0; j < 8; j++) {
+            cAddRH1.msg[i * 8 + j] <== msg2Bits[i].out[j];
+        }
+    }
+
+    for(i = 0; i < 32; i++) {
+        for(j = 0; j < 8; j++) {
+            cAddRH1.A[i * 8 + j] <== pb2Bits[i].out[j];
+            cAddRH1.R8[i * 8 + j] <== r8ToBits[i].out[j];
+        }
+    }
+
+    for(i = 0; i < 4; i++) {
+        for(j = 0; j < 3; j++) {
+            cAddRH1.PointA[i][j] <== PointA[i][j];
+            cAddRH1.PointR[i][j] <== PointR[i][j];
+        }
+    }
+
+    for(i = 0; i < 4; i++) {
+        for(j = 0; j < 3; j++) {
+            cAddRH.R[i][j] === cAddRH1.R[i][j];
+        }
+    }
+}
+component main = VerifyAddRH();

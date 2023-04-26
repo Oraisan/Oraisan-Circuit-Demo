@@ -40,6 +40,5 @@ template VerifySovByte(nBytes) {
         out[i] === tsb.out[i];
     }
 
-    log(tsb.length);
 }
 component main = VerifySovByte(5);

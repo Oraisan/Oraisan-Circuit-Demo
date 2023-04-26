@@ -15,11 +15,11 @@ template EncodeTimestamp(prefix, prefixSeconds, prefixNanos) {
     var i;
     var idx;
 
-    component bs = EncodeTimeUnit(prefixSeconds, 5);
+    component bs = EncodeTimeUnit(prefixSeconds);
     bs.timeUnit <== seconds;
 
 
-    component bn = EncodeTimeUnit(prefixNanos, 5);
+    component bn = EncodeTimeUnit(prefixNanos);
     bn.timeUnit <== nanos;
 
     component pbot = PutBytesOnTop(6, 6);

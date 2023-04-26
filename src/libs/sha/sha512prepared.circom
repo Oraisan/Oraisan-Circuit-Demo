@@ -32,10 +32,11 @@ template Sha512Prepared(nBlocks) {
     var k;
 
     component paddedIn[nBlocks * 128];
-    for (var i = 0; i < nBlocks * 128; i++) {
+    for (i = 0; i < nBlocks * 128; i++) {
         paddedIn[i] = Num2Bits(8);
         paddedIn[i].in <== in[i];
     }
+
 
     component ha0 = H512(0);
     component hb0 = H512(1);
@@ -85,9 +86,9 @@ template Sha512Prepared(nBlocks) {
 
 
     component bitsToBytes[64];
-    for (var i = 0; i < 64; i++) {
+    for (i = 0; i < 64; i++) {
         bitsToBytes[i] = Bits2Num(8);
-        for (var j = 0; j < 8; j++) {
+        for (j = 0; j < 8; j++) {
             bitsToBytes[i].in[7-j] <== sha512compression[nBlocks-1].out[i*8+j];
         }
         out[i] <== bitsToBytes[i].out;

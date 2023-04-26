@@ -128,3 +128,18 @@ template SwitchSovByte() {
 
     out <== bitsToBytes.out[0];
 }
+
+template ReverseByte() {
+    signal input in;
+    signal output out;
+
+    component numToBits = Num2Bits(8);
+    numToBits.in <== in;
+
+    component bitsToBytes = BitsToBytes(1);
+    for(var i = 0; i < 8; i++) {
+        bitsToBytes.in[i] <== numToBits.out[7 - i];
+    }
+
+    out <== bitsToBytes.out[0];
+}

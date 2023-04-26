@@ -29,9 +29,6 @@ template VerifyDAVHash() {
         parrent.L[i] <== dataHashLeaf.out[i];
         parrent.R[i] <== validatorsHashLeaf.out[i];
     }
-    for(i = 0; i < 8; i++) {
-        log(parrent.out[i]);
-    }
 
     component root = CalculateRootFromSiblings(3);
     for(i = 0; i < 3; i++) {

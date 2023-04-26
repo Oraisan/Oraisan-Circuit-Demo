@@ -10,7 +10,7 @@ include "../node_modules/circomlib/circuits/comparators.circom";
 include "../node_modules/circomlib/circuits/gates.circom";
 
 
-template Ed25519Verifier(n) {
+template Ed25519Verifier1(n) {
   signal input msg[n];
   
   signal input A[256];
@@ -25,12 +25,12 @@ template Ed25519Verifier(n) {
   var i;
   var j;
 
-  component pMul1 = CalculatePMul1();
+  component pMul1 = CalculatePMul11();
   for(i = 0; i < 255; i++) {
     pMul1.S[i] <== S[i];
   }
 
-  component addRH = CalculateAddRH(n);
+  component addRH = CalculateAddRH1(n);
   for(i = 0; i < n; i ++) {
     addRH.msg[i] <== msg[i];
   }
@@ -47,7 +47,7 @@ template Ed25519Verifier(n) {
     }
   }
 
-  component equal = PointEqual();
+  component equal = PointEqual1();
   for(i=0; i<3; i++) {
     for(j=0; j<3; j++) {
       equal.p[i][j] <== pMul1.sP[i][j];
@@ -58,7 +58,7 @@ template Ed25519Verifier(n) {
   out <== equal.out;
 }
 
-template CalculatePMul1() {
+template CalculatePMul11() {
   signal input S[255];
   signal output sP[4][3];
 
@@ -88,7 +88,7 @@ template CalculatePMul1() {
   }
 }
 
-template CalculateAddRH(n) {
+template CalculateAddRH1(n) {
   assert(n % 8 == 0);
 
   signal input msg[n];
@@ -123,6 +123,7 @@ template CalculateAddRH(n) {
     for(j=0; j<8; j++) {
       hash.in[i+j] <== R8[i+(7-j)];
       hash.in[256+i+j] <== A[i+(7-j)];
+      // log("old AR8", 256+i+j, R8[i+(7-j)], A[i+(7-j)]);
     }
   }
 
@@ -137,6 +138,7 @@ template CalculateAddRH(n) {
     for(j=0; j<8; j++) {
       bitModulus.in[i+j] <== hash.out[i + (7-j)];
     }
+    // log("old hash", i/8, hash.out[i + 7], hash.out[i + 6], hash.out[i + 5], hash.out[i + 4], hash.out[i + 3], hash.out[i + 2], hash.out[i + 1], hash.out[i + 0]);
   }
 
   component pMul2 = ScalarMul();
@@ -167,7 +169,7 @@ template CalculateAddRH(n) {
   }
 }
 
-template PointEqual() {
+template PointEqual1() {
   signal input p[3][3];
   signal input q[3][3];
   signal output out;
