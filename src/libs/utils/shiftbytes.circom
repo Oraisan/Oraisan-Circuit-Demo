@@ -2,6 +2,7 @@
 pragma circom 2.0.0;
 
 include "convert.circom";
+include "string.circom";
 include "../../../node_modules/circomlib/circuits/bitify.circom";
 include "../../../node_modules/circomlib/circuits/comparators.circom";
 include "../../../node_modules/circomlib/circuits/switcher.circom";
@@ -52,26 +53,26 @@ template CopyBytesToEmptyString(nString, nBytes) {
     }
 }
 
-template PutBytesOnTop(nBytesFirst, nBytesLast) {
-    signal input s1[nBytesFirst];
-    signal input s2[nBytesLast];
+template PutBytesOnTop(nBytes1, nBytes2) {
+    signal input s1[nBytes1];
+    signal input s2[nBytes2];
     signal input idx;
     
-    signal output out[nBytesFirst + nBytesLast];
+    signal output out[nBytes1 + nBytes2];
 
     var i;
     var j;
 
-    component rb = CopyBytesToEmptyString(nBytesFirst + nBytesLast, nBytesLast);
-    for(i = 0; i < nBytesLast; i++) {
+    component rb = CopyBytesToEmptyString(nBytes1 + nBytes2, nBytes2);
+    for(i = 0; i < nBytes2; i++) {
         rb.in[i] <== s2[i];
     }
     rb.startIndex <== idx;
 
-    component flags[nBytesFirst + nBytesLast];
-    component sw[nBytesFirst + nBytesLast];
+    component flags[nBytes1 + nBytes2];
+    component sw[nBytes1 + nBytes2];
 
-    for(i = 0; i < nBytesFirst; i++) {
+    for(i = 0; i < nBytes1; i++) {
         flags[i] = LessEqThan(8);
         flags[i].in[0] <== idx;
         flags[i].in[1] <== i; 
@@ -84,10 +85,10 @@ template PutBytesOnTop(nBytesFirst, nBytesLast) {
         out[i] <== sw[i].outL;
     }
 
-    for(i = nBytesFirst; i < nBytesFirst + nBytesLast; i++) {
+    for(i = nBytes1; i < nBytes1 + nBytes2; i++) {
         flags[i] = LessEqThan(8);
         flags[i].in[0] <== i; 
-        flags[i].in[1] <== nBytesLast + idx;
+        flags[i].in[1] <== nBytes2 + idx;
 
         sw[i] = Switcher();
         sw[i].sel <== flags[i].out;
@@ -98,37 +99,64 @@ template PutBytesOnTop(nBytesFirst, nBytesLast) {
 
 }
 
-template TrimSovBytes(nBytes) {
-    signal input in[nBytes];
-
-    signal output out[nBytes];
+template PutBytesArrayOnTop(nArrays, nBytes) {
+    signal input in[nArrays][nBytes];
+    signal input real_length[nArrays];
+    
+    signal output out[nArrays * nBytes];
     signal output length;
 
     var i;
-    var k = 0;
-    var flags[nBytes];
+    var j;
 
-    component isEmpty[nBytes];
-    for(i = 0; i < nBytes; i++) {
-        isEmpty[i] = IsEqual();
-        isEmpty[i].in[0] <== in[i];
-        isEmpty[i].in[1] <== (i < nBytes -1) ? 128 : 0;
-        k += isEmpty[i].out;
-    } 
+    component left;
+    component right;
+    component parrent;
 
+    if(nArrays == 1) {
+        for(i = 0; i < nBytes; i++) {
+            out[i] <== in[0][i];
+        }
+        length = real_length[0];
+    } else {
+        var k = getSplitPoint(nLeafs);
+        left = PutBytesArrayOnTop(k, nBytes);
+        for(i = 0; i < k; i++) {
+            for(j = 0; j < nBytes; j++) {
+                left.in[i][j] <== in[i][j];
+            }
+            left.real_length[i] <== real_length[i];
+        }
 
-    component isSW[nBytes];
-    component swSB[nBytes];
-    for(i = 0; i < nBytes; i++) {
-        isSW[i] = LessThan(32);
-        isSW[i].in[0] <== i + 1;
-        isSW[i].in[1] <== nBytes - k;
+        right = PutBytesArrayOnTop(nArrays - k, nBytes);
+        for(i = k; i < nLeafs; i++) {
+            for(j = 0; j < nBytes; j++) {
+                right.in[i-k][j] <== in[i][j];
+            }
+            right.real_length[i-k] <== real_length[i];
+        }
 
-        swSB[i] = SwitchSovByte();
-        swSB[i].xor <== isSW[i].out;
-        swSB[i].in <== in[i];
+        parrent = PutBytesOnTop(k * nBytes, (nArrays - k) * nBytes);
+        for(i = 0; i < k * nBytes; i++) {
+            parrent.s1[i] <== left.out[i];
+        }
+        parrent.idx <== left.length;
+        for(i = 0; i < (nArrays - k) * nBytes; i++) {
+            parrent.s2[i] <== right.out[i];
+        }
 
-        out[i] <== swSB[i].out;
+        for(i = 0; i < nArrays * nBytes; i++) {
+            out[i] <== parrent.out[i];
+        }
+        length <== left.length + right.length;
     }
-    length <== nBytes - k;
 }
+
+function getSplitPoint(nBytes) {
+    var i = 1;
+    for(i = 1; i * 2 < nBytes; i *= 2) {
+        
+    }
+    return i;
+}
+

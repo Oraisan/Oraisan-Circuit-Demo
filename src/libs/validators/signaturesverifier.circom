@@ -62,6 +62,10 @@ template SignatureVerifier(nChainID) {
     msg.seconds <== sigTimeSeconds;
     msg.nanos <== sigTimeNanos;
 
+    // for(i = 0 ; i < nBytes; i++) {
+    //     log(msg.out[i]);
+    // }
+
     component v = Ed25519Verifier(nBytes);
 
     for(i = 0; i < nBytes; i++) {

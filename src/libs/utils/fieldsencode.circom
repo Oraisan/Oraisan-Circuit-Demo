@@ -26,7 +26,7 @@ template EncodeTimeUnit(prefix) {
     component sntb = SovNumToBytes(5);
     sntb.in <== timeUnit;
     
-
+    
     component tsb = TrimSovBytes(5);
     for(var i = 0; i < 5; i++) {
         tsb.in[i] <== sntb.out[i];
@@ -37,7 +37,7 @@ template EncodeTimeUnit(prefix) {
     for(var i = 0; i < 5; i++) {
         out[i + 1] <== tsb.out[i];
     }
-
+    
     length <== tsb.length + 1;
 }
 
