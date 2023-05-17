@@ -3,16 +3,16 @@ pragma circom 2.0.0;
 include "../../../../libs/utils/string.circom";
 include "../../../../libs/utils/convert.circom";
 include "../../../../libs/utils/shiftbytes.circom";
-include "./encodeModeInfo/modeinfoencode.cirom";
+include "./encodeModeInfo/modeinfoencode.circom";
 include "./encodePublicKey/publickeyencode.circom";
-include "./encodeSequence/sequenceecode.circom";
+include "./encodeSequence/sequenceencode.circom";
 
-template SignerInfosArrayEncode(nSignerInfos, nBytesPublicKeyType, nBytesPublicKey) {
+template SignerInfosArrayEncode(nSignerInfos, nBytesPublicKeyType, nBytesKey) {
 
-    var nBytesSignerInfoMarshal = getLengthSignerInfoMarshal(nBytesPublicKeyType, nBytesPublicKey);
+    var nBytesSignerInfoMarshal = getLengthSignerInfoMarshal(nBytesPublicKeyType, nBytesKey);
 
     signal input authInfo_signerInfos_publicKey_type[nSignerInfos][nBytesPublicKeyType];
-    signal input authInfo_signerInfos_publicKey_key[nSignerInfos][nBytesPublicKey];
+    signal input authInfo_signerInfos_publicKey_key[nSignerInfos][nBytesKey];
     signal input authInfo_signerInfos_modeInfo[nSignerInfos];
     signal input authInfo_signerInfos_sequence[nSignerInfos];
 
@@ -24,11 +24,11 @@ template SignerInfosArrayEncode(nSignerInfos, nBytesPublicKeyType, nBytesPublicK
 
     component sie[nSignerInfos];
     for(i = 0; i < nSignerInfos; i++) {
-        sie[i] = SignerInfosEncode(nBytesPublicKeyType, nBytesPublicKey);
+        sie[i] = SignerInfosEncode(nBytesPublicKeyType, nBytesKey);
         for(j = 0; j < nBytesPublicKeyType; j++) {
             sie[i].authInfo_signerInfos_publicKey_type[j] <== authInfo_signerInfos_publicKey_type[i][j];
         }
-        for(j = 0; j < nBytesPublicKey; j++) {
+        for(j = 0; j < nBytesKey; j++) {
             sie[i].authInfo_signerInfos_publicKey_key[j] <== authInfo_signerInfos_publicKey_key[i][j];
         }
         sie[i].authInfo_signerInfos_modeInfo <== authInfo_signerInfos_modeInfo[i];
@@ -49,17 +49,17 @@ template SignerInfosArrayEncode(nSignerInfos, nBytesPublicKeyType, nBytesPublicK
     length <== pbaot.length;
 }
 
-template SignerInfosEncode(nBytesPublicKeyType, nBytesPublicKey) {
+template SignerInfosEncode(nBytesPublicKeyType, nBytesKey) {
     var prefixSignerInfos = 0xa;
 
-    var nBytesPublicKeyMarshal = getLengthPublicKeyMarshal();
+    var nBytesPublicKeyMarshal = getLengthPublicKeyMarshal(nBytesPublicKeyType, nBytesKey);
     var nBytesModeInfoMarshal = getLengthModeInfoMarshal();
     var nBytesSequenceMarshal = getLengthSequenceMarshal();
-    var nBytesSignerInfo = getLengthSignerInfo(nBytesPublicKeyType, nBytesPublicKey);
+    var nBytesSignerInfo = getLengthSignerInfo(nBytesPublicKeyType, nBytesKey);
     var nBytesSignerInfoMarshal = getLengthStringMarshal(nBytesSignerInfo);
 
     signal input authInfo_signerInfos_publicKey_type[nBytesPublicKeyType];
-    signal input authInfo_signerInfos_publicKey_key[nBytesPublicKey];
+    signal input authInfo_signerInfos_publicKey_key[nBytesKey];
     signal input authInfo_signerInfos_modeInfo;
     signal input authInfo_signerInfos_sequence;
 
@@ -82,11 +82,11 @@ template SignerInfosEncode(nBytesPublicKeyType, nBytesPublicKey) {
         pbsot.s2[i] <== se.out[i];
     }
     
-    component pke = PublicKeyEncode(nBytesPublicKeyType, nBytesPublicKey);
+    component pke = PublicKeyEncode(nBytesPublicKeyType, nBytesKey);
     for(i = 0; i < nBytesPublicKeyType; i++) {
         pke.authInfo_signerInfos_publicKey_type[i] <== authInfo_signerInfos_publicKey_type[i];
     }
-    for(i = 0; i < nBytesPublicKey; i++) {
+    for(i = 0; i < nBytesKey; i++) {
         pke.authInfo_signerInfos_publicKey_key[i] <== authInfo_signerInfos_publicKey_key[i];
     }
 
@@ -111,10 +111,14 @@ template SignerInfosEncode(nBytesPublicKeyType, nBytesPublicKey) {
     length <== sm.length;
 }
 
-function getLengthSignerInfoMarshal(nBytesPublicKeyType, nBytesPublicKey) {
-    return getLengthStringMarshal(getLengthSignerInfo());
+function getLengthSignerInfoMarshal(nBytesPublicKeyType, nBytesKey) {
+    return getLengthStringMarshal(getLengthSignerInfo(nBytesPublicKeyType, nBytesKey));
 }
 
-function getLengthSignerInfo(nBytesPublicKeyType, nBytesPublicKey) {
-    return getLengthPublicKeyMarshal() + getLengthModeInfoMarshal() + getLengthSequenceMarshal();
+function getLengthSignerInfosMarshal(nSignerInfos, nBytesPublicKeyType, nBytesKey) {
+    return nSignerInfos * getLengthSignerInfoMarshal(nBytesPublicKeyType, nBytesKey);
+}
+
+function getLengthSignerInfo(nBytesPublicKeyType, nBytesKey) {
+    return getLengthPublicKeyMarshal(nBytesPublicKeyType, nBytesKey) + getLengthModeInfoMarshal() + getLengthSequenceMarshal();
 }

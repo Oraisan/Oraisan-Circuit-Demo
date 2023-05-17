@@ -4,16 +4,16 @@ include "../../../../../libs/utils/string.circom";
 include "../../../../../libs/utils/convert.circom";
 include "../../../../../libs/utils/shiftbytes.circom";
 
-template PublicKeyEncode(nBytesPublicKeyType, nBytesPublicKey) {
+template PublicKeyEncode(nBytesPublicKeyType, nBytesKey) {
     var prefixPublicKey = 0xa;
 
-    var nBytesPublicKeyTypeMarshal = getLengthPublicKeyTypeMarshal(nBytes);
-    var nBytesPublicKeyValueMarshal = getLengthPublicKeyValueMarshal(nBytes);
+    var nBytesPublicKeyTypeMarshal = getLengthPublicKeyTypeMarshal(nBytesPublicKeyType);
+    var nBytesPublicKeyValueMarshal = getLengthPublicKeyValueMarshal(nBytesKey);
     var nBytesPublicKey = nBytesPublicKeyTypeMarshal + nBytesPublicKeyValueMarshal;
     var nBytesPublicKeyMarshal = getLengthStringMarshal(nBytesPublicKey);
 
     signal input authInfo_signerInfos_publicKey_type[nBytesPublicKeyType];
-    signal input authInfo_signerInfos_publicKey_key[nBytesPublicKey];
+    signal input authInfo_signerInfos_publicKey_key[nBytesKey];
     
     signal output out[nBytesPublicKeyMarshal];
     signal output length;
@@ -25,8 +25,8 @@ template PublicKeyEncode(nBytesPublicKeyType, nBytesPublicKey) {
         pktue.in[i] <== authInfo_signerInfos_publicKey_type[i];
     }
 
-    component pkve = PublicKeyValueEncode(nBytesPublicKey);
-    for(i = 0; i < nBytesPublicKey; i++) {
+    component pkve = PublicKeyValueEncode(nBytesKey);
+    for(i = 0; i < nBytesKey; i++) {
         pkve.in[i] <== authInfo_signerInfos_publicKey_key[i];
     }
 
@@ -56,7 +56,7 @@ template PublicKeyValueEncode(nBytes) {
     var prefixKey = 0xa;
     var prefixValue = 0x12;
 
-    var nBytesPublicKeyMarshal = getLengthPublicKeyMarshal(nBytes);
+    var nBytesKeyMarshal = getLengthKeyMarshal(nBytes);
     var nBytesPublicKeyValueMarshal = getLengthPublicKeyValueMarshal(nBytes);
 
     signal input in[nBytes];
@@ -72,9 +72,9 @@ template PublicKeyValueEncode(nBytes) {
         smKey.in[i] <== in[i];
     }
 
-    component smValue = StringMarshal(nBytesPublicKeyMarshal);
+    component smValue = StringMarshal(nBytesKeyMarshal);
     smValue.prefix <== prefixValue;
-    for(i = 0; i < nBytesPublicKeyMarshal; i++) {
+    for(i = 0; i < nBytesKeyMarshal; i++) {
         smValue.in[i] <== smKey.out[i];
     }
 
@@ -113,7 +113,7 @@ function getLengthPublicKeyTypeMarshal(nBytesPublicKeyType) {
     return getLengthStringMarshal(nBytesPublicKeyType);
 }
 
-function getLengthPublicKeyMarshal(nBytesPublicKey) {
+function getLengthKeyMarshal(nBytesPublicKey) {
     return getLengthStringMarshal(nBytesPublicKey);
 }
 

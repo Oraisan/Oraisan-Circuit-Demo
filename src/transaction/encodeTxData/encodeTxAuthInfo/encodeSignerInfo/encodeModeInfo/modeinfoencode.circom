@@ -13,7 +13,9 @@ template ModeInfoEncode() {
     signal output out[nBytesModeInfoMarshal];
     signal output length;
 
-    component se = SingleEncode(nBytes);
+    var i;
+
+    component se = SingleEncode();
     se.in <== in;
 
     component sm = StringMarshal(nBytesSingleMarshal);
@@ -30,6 +32,8 @@ template ModeInfoEncode() {
 
 template SingleEncode() {
     var prefixSingle = 0xa;
+
+    var nBytes = getLengthMode();
     var nBytesSingleMarshal  = getLengthSingleMarshal();
 
     signal input in;
@@ -38,7 +42,7 @@ template SingleEncode() {
     signal output length;
 
     var i;
-    component me = ModeEncode(nBytes);
+    component me = ModeEncode();
     me.in <== in;
 
     component sm = StringMarshal(1 + nBytes);
@@ -73,7 +77,7 @@ template ModeEncode() {
 
     out[0] <== prefixMode;
     
-    for(i = 0; i < 1 + nBytes; i++) {
+    for(i = 0; i < nBytes; i++) {
         out[i + 1] <== tsb.out[i];
     }
     length <== tsb.length;

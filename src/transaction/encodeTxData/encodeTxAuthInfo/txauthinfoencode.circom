@@ -3,17 +3,26 @@ pragma circom 2.0.0;
 include "../../../libs/utils/string.circom";
 include "../../../libs/utils/convert.circom";
 include "../../../libs/utils/shiftbytes.circom";
+include "./encodeFee/feeencode.circom";
+include "./encodeFee/encodeAmount/amountencode.circom";
+include "./encodeFee/encodeGasLimit/gaslimitencode.circom";
+include "./encodeSignerInfo/encodeModeInfo/modeinfoencode.circom";
+include "./encodeSignerInfo/encodePublicKey/publickeyencode.circom";
+include "./encodeSignerInfo/encodeSequence/sequenceencode.circom";
+include "./encodeSignerInfo/signerinfoencode.circom";
 
-template AuthInfoEncode(nSignerInfos, nBytesPublicKeyType, nBytesPublicKey, nAmount, nBytesFeeDenom, nBytesFeeAmount) {
+template AuthInfoEncode(nSignerInfos, nBytesPublicKeyType, nBytesKey, nAmount) {
     var prefixAuthInfo = 0x12;
 
-    var nBytesSignerInfoMarshal = getLengthSignerInfoMarshal(nBytesPublicKeyType, nBytesPublicKey);
-    var nBytesFeeMarshal = getLengthFeeMarshal(nAmount, nBytesFeeDenom, nBytesFeeAmount);
+    var nBytesFeeDenom = getLengthFeeDenom();
+    var nBytesFeeAmount = getLengthFeeAmount();
+    var nBytesSignerInfoMarshal = getLengthSignerInfoMarshal(nBytesPublicKeyType, nBytesKey);
+    var nBytesFeeMarshal = getLengthFeeMarshal(nAmount);
     var nBytesAuthInfo = nBytesSignerInfoMarshal + nBytesFeeMarshal;
     var nBytesAuthInfoMarshal = getLengthStringMarshal(nBytesAuthInfo);
 
     signal input authInfo_signerInfos_publicKey_type[nSignerInfos][nBytesPublicKeyType];
-    signal input authInfo_signerInfos_publicKey_key[nSignerInfos][nBytesPublicKey];
+    signal input authInfo_signerInfos_publicKey_key[nSignerInfos][nBytesKey];
     signal input authInfo_signerInfos_modeInfo[nSignerInfos];
     signal input authInfo_signerInfos_sequence[nSignerInfos];
     signal input authInfo_fee_amount_denom[nAmount][nBytesFeeDenom];
@@ -26,19 +35,19 @@ template AuthInfoEncode(nSignerInfos, nBytesPublicKeyType, nBytesPublicKey, nAmo
     var i;
     var j;
 
-    component siae = SignerInfosArrayEncode(nSignerInfos, nBytesPublicKeyType, nBytesPublicKey);
+    component siae = SignerInfosArrayEncode(nSignerInfos, nBytesPublicKeyType, nBytesKey);
     for(i = 0; i < nSignerInfos; i++) {
         for(j = 0; j < nBytesPublicKeyType; j++) {
             siae.authInfo_signerInfos_publicKey_type[i][j] <== authInfo_signerInfos_publicKey_type[i][j];
         }
-        for(j = 0; j < nBytesPublicKey; j++) {
+        for(j = 0; j < nBytesKey; j++) {
             siae.authInfo_signerInfos_publicKey_key[i][j] <== authInfo_signerInfos_publicKey_key[i][j];
         }
         siae.authInfo_signerInfos_modeInfo[i] <== authInfo_signerInfos_modeInfo[i];
         siae.authInfo_signerInfos_sequence[i] <== authInfo_signerInfos_sequence[i];
     }
 
-    component fe = FeeEncode(nAmount, nBytesPublicKeyType, nBytesPublicKey);
+    component fe = FeeEncode(nAmount);
     for(i = 0; i < nAmount; i++) {
         for(j = 0; j < nBytesFeeDenom; j++) {
             fe.authInfo_fee_amount_denom[i][j] <== authInfo_fee_amount_denom[i][j];
@@ -70,12 +79,12 @@ template AuthInfoEncode(nSignerInfos, nBytesPublicKeyType, nBytesPublicKey, nAmo
     length <== sm.length;
 }
 
-function getLengthAuthInfo(nSignerInfos, nBytesPublicKeyType, nBytesPublicKey, nAmount, nBytesFeeDenom, nBytesFeeAmount) {
-    return getLengthSignerInfoMarshal(nSignerInfos, nBytesPublicKeyType, nBytesPublicKey) + getLengthFeeMarshal(nAmount, nBytesFeeDenom, nBytesFeeAmount);
+function getLengthAuthInfo(nSignerInfos, nBytesPublicKeyType, nBytesKey, nAmount) {
+    return nSignerInfos * getLengthSignerInfoMarshal(nBytesPublicKeyType, nBytesKey) + getLengthFeeMarshal(nAmount);
 }
 
-function getLengthAuthInfoMarshal(nSignerInfos, nBytesPublicKeyType, nBytesPublicKey, nAmount, nBytesFeeDenom, nBytesFeeAmount) {
-    return getLengthStringMarshal(getLengthAuthInfo(nSignerInfos, nBytesPublicKeyType, nBytesPublicKey, nAmount, nBytesFeeDenom, nBytesFeeAmount));
+function getLengthAuthInfoMarshal(nSignerInfos, nBytesPublicKeyType, nBytesKey, nAmount) {
+    return getLengthStringMarshal(getLengthAuthInfo(nSignerInfos, nBytesPublicKeyType, nBytesKey, nAmount));
 }
 
 
