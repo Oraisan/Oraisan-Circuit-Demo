@@ -2,8 +2,11 @@
 pragma circom 2.0.0;
 
 template Length(nBytes) {
-    signal in[nBytes];
-    signal out;
+    signal input in[nBytes];
+    signal output out;
+
+    var i;
+    var k = 0;
 
     component isEmpty[nBytes];
     component mayEmpty[nBytes];
@@ -40,10 +43,15 @@ template AddLengthStringMarshal(nBytes) {
     var i;
     var j;
 
-    component sntb = SovNumToBytes(nSovBytes);
-    sntb.in <== nBytes;
+    component len_string = Length(nBytes);
+    for(i = 0; i < nBytes; i++) {
+        len_string.in[i] <== in[i];
+    }
 
-    component tsb = TrimSovBytes(nBytes);
+    component sntb = SovNumToBytes(nSovBytes);
+    sntb.in <== len_string.out;
+
+    component tsb = TrimSovBytes(nSovBytes);
     for(i = 0; i < nSovBytes; i++) {
         tsb.in[i] <== sntb.out[i];
     }
@@ -62,10 +70,7 @@ template AddLengthStringMarshal(nBytes) {
         out[i] <== pbot.out[i];
     }
 
-    component len_string = Length(nBytes);
-    for(i = 0; i < nBytes; i++) {
-        len_string.in[i] <== in[i];
-    }
+
     length <== tsb.length + len_string.out;
 }
 
@@ -94,7 +99,7 @@ template StringMarshal(nBytes) {
 
 template ConcatStringMarshal(nBytes1, nBytes2) {
     var nBytes1Marshal = getLengthStringMarshal(nBytes1);
-    var nBytes2Marshal = getLengthStringMarshal(nBytes2)1;
+    var nBytes2Marshal = getLengthStringMarshal(nBytes2);
 
     signal input prefix1;
     signal input s1[nBytes1];
@@ -102,6 +107,7 @@ template ConcatStringMarshal(nBytes1, nBytes2) {
     signal input s2[nBytes2];
 
     signal output out[nBytes1Marshal + nBytes2Marshal];
+    signal output length;
 
     var i;
     var j;
@@ -119,13 +125,13 @@ template ConcatStringMarshal(nBytes1, nBytes2) {
     }
 
     component pbot = PutBytesOnTop(nBytes1Marshal, nBytes2Marshal);
-    for(i = 0; i < nBytes1; i++) {
-        pbot.s1[i] <== s1[i];
+    for(i = 0; i < nBytes1Marshal; i++) {
+        pbot.s1[i] <== smS1.out[i];
     }
     pbot.idx <== smS1.length;
 
-    for(i = 0; i < nBytes2; i++) {
-        pbot.s2[i] <== s2[i];
+    for(i = 0; i < nBytes2Marshal; i++) {
+        pbot.s2[i] <== smS2.out[i];
     }
     
     for(i = 0; i < nBytes1Marshal + nBytes2Marshal; i++) {
@@ -135,7 +141,7 @@ template ConcatStringMarshal(nBytes1, nBytes2) {
 }
 
 template TrimSovBytes(nBytes) {
-    assert(nBytes > 1);
+    // assert(nBytes == 0);
 
     signal input in[nBytes];
 
@@ -203,5 +209,7 @@ function getNumSovBytes(nBytes) {
 
 function getLengthStringMarshal(nBytes) {
     var nSovBytes = getNumSovBytes(nBytes);
-    return 1 + nSovBytes + nBytes;
+    var length = 1 + nSovBytes + nBytes;
+    // log("getLengthStringMarshal", nSovBytes, nBytes, length);
+    return length;
 }

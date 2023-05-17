@@ -117,9 +117,9 @@ template PutBytesArrayOnTop(nArrays, nBytes) {
         for(i = 0; i < nBytes; i++) {
             out[i] <== in[0][i];
         }
-        length = real_length[0];
+        length <== real_length[0];
     } else {
-        var k = getSplitPoint(nLeafs);
+        var k = getSplitPoint(nArrays);
         left = PutBytesArrayOnTop(k, nBytes);
         for(i = 0; i < k; i++) {
             for(j = 0; j < nBytes; j++) {
@@ -129,7 +129,7 @@ template PutBytesArrayOnTop(nArrays, nBytes) {
         }
 
         right = PutBytesArrayOnTop(nArrays - k, nBytes);
-        for(i = k; i < nLeafs; i++) {
+        for(i = k; i < nArrays; i++) {
             for(j = 0; j < nBytes; j++) {
                 right.in[i-k][j] <== in[i][j];
             }
@@ -157,6 +157,7 @@ function getSplitPoint(nBytes) {
     for(i = 1; i * 2 < nBytes; i *= 2) {
         
     }
+
     return i;
 }
 

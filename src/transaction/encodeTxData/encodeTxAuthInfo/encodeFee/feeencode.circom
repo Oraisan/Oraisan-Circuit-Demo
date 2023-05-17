@@ -1,30 +1,32 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
-include "../../../../lib/utils/string.circom";
-include "../../../../lib/utils/convert.circom";
-include "../../../../lib/utils/shiftbytes.circom";
+include "../../../../libs/utils/string.circom";
+include "../../../../libs/utils/convert.circom";
+include "../../../../libs/utils/shiftbytes.circom";
 include "./encodeAmount/amountencode.circom";
 include "./encodeGasLimit/gaslimitencode.circom";
 
-template FeeEncode(nAmount, nBytesFeeDenom, nBytesFeeAmount) {
+template FeeEncode(nAmount) {
     var prefixFee = 0x12;
 
-    var nBytesAmountMarshal = getLengthAmountMarshal(nBytesFeeDenom, nBytesFeeAmount);
+    var nBytesFeeDenom = getLengthFeeDenom();
+    var nBytesFeeAmount = getLengthFeeAmount();
+    var nBytesAmountMarshal = getLengthAmountMarshal();
     var nBytesGasLimitMarshal = getLengthGasLimitMarshal();
 
     var nBytesFee = nBytesAmountMarshal * nAmount + nBytesGasLimitMarshal;
     var nBytesFeeMarshal = getLengthStringMarshal(nBytesFee);
 
-    signal authInfo_fee_amount_denom[nAmount][nBytesFeeDenom];
-    signal authInfo_fee_amount_amount[nAmount][nBytesFeeAmount];
-    signal authInfo_fee_gasLimit;
+    signal input authInfo_fee_amount_denom[nAmount][nBytesFeeDenom];
+    signal input authInfo_fee_amount_amount[nAmount][nBytesFeeAmount];
+    signal input authInfo_fee_gasLimit;
 
     signal output out[nBytesFeeMarshal];
     signal output length;
 
     var i;
     var j;
-    component aae = AmountArrayEncode(nAmount, nBytesFeeDenom, nBytesFeeAmount);
+    component aae = AmountArrayEncode(nAmount);
     for(i = 0; i < nAmount; i++) {
         for(j = 0; j < nBytesFeeDenom; j++) {
             aae.authInfo_fee_amount_denom[i][j] <== authInfo_fee_amount_denom[i][j];
@@ -59,12 +61,12 @@ template FeeEncode(nAmount, nBytesFeeDenom, nBytesFeeAmount) {
     length <== sm.length;
 }
 
-function getLengthFee(nAmount, nBytesFeeDenom, nBytesFeeAmount) {
+function getLengthFee(nAmount) {
     return nAmount * getLengthAmountMarshal() + getLengthGasLimitMarshal();
 }
 
-function getLengthFeeMarshal(nAmount, nBytesFeeDenom, nBytesFeeAmount) {
-    return getLengthStringMarshal(getLengthFee(nAmount, nBytesFeeDenom, nBytesFeeAmount));
+function getLengthFeeMarshal(nAmount) {
+    return getLengthStringMarshal(getLengthFee(nAmount));
 }
 
 

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
-include "../../../lib/utils/string.circom";
-include "../../../lib/utils/convert.circom";
-include "../../../lib/utils/shiftbytes.circom";
+include "../../../libs/utils/string.circom";
+include "../../../libs/utils/convert.circom";
+include "../../../libs/utils/shiftbytes.circom";
 
 template SignaturesArrayEncode(nSignatures, nBytesSignature) {
     var nBytesSignatureMarshal = getLengthSigntureMarshal(nBytesSignature);
@@ -21,12 +21,12 @@ template SignaturesArrayEncode(nSignatures, nBytesSignature) {
         }
     }
 
-    component pbaot = PutBytesArrayOnTop(nSignatures, nBytesSequenceMarshal);
+    component pbaot = PutBytesArrayOnTop(nSignatures, nBytesSignatureMarshal);
     for(i = 0; i < nSignatures; i++) {
         for(j = 0; j < nBytesSignatureMarshal; j++) {
             pbaot.in[i][j] <== se[i].out[j];
         }
-        pbaot.length[i] <== se.length;
+        pbaot.real_length[i] <== se[i].length;
     }
 
     for(i = 0; i < nSignatures * nBytesSignatureMarshal; i++) {

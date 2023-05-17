@@ -2,6 +2,7 @@
 pragma circom 2.0.0;
 
 include "../shiftbytes.circom";
+include "../string.circom";
 
 template VerifyShift(nBytesFirst, nBytesLast) {
     signal input s1[nBytesFirst];
@@ -41,4 +42,26 @@ template VerifySovByte(nBytes) {
     }
 
 }
-component main = VerifySovByte(5);
+
+template VerifyLength(nBytes) {
+    signal input in[nBytes];
+    component l = Length(nBytes);
+    for(var i = 0; i < nBytes; i++) {
+        l.in[i] <== in[i];
+    }
+    log(l.out);
+}
+
+template VerifyPutBytesArrayOnTop(nArray, nBytes) {
+    signal input in[nArray][nBytes];
+    signal input real_length[nArray];
+    signal output out[nArray * nBytes];
+    component pbaot = PutBytesArrayOnTop(nArray, nBytes);
+    for(var i = 0; i < nArray; i++) {
+        for(var j = 0; j < nBytes; j++) {
+            pbaot.in[i][j] <== in[i][j];
+        }
+        pbaot.real_length[i] <== real_length[i];
+    }
+}
+component main = VerifyPutBytesArrayOnTop(2, 3);

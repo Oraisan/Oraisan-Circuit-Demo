@@ -106,5 +106,6 @@ function getSplitPoint(nLeafs) {
     for(i = 1; i * 2 < nLeafs; i *= 2) {
         
     }
+
     return i;
 }

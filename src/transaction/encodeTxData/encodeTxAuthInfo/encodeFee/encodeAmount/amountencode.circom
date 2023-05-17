@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
-include "../../../../../lib/utils/string.circom";
-include "../../../../../lib/utils/convert.circom";
-include "../../../../../lib/utils/shiftbytes.circom";
+include "../../../../../libs/utils/string.circom";
+include "../../../../../libs/utils/convert.circom";
+include "../../../../../libs/utils/shiftbytes.circom";
 
-template AmountArrayEncode(nAmount, nBytesFeeDenom, nBytesFeeAmount) {
-    var nBytesAmountMarshal = getLengthAmountMarshal(nBytesFeeDenom, nBytesFeeAmount);
+template AmountArrayEncode(nAmount) {
+    var nBytesFeeDenom = getLengthFeeDenom();
+    var nBytesFeeAmount = getLengthFeeAmount();
+    var nBytesAmountMarshal = getLengthAmountMarshal();
 
-    signal authInfo_fee_amount_denom[nAmount][nBytesFeeDenom];
-    signal authInfo_fee_amount_amount[nAmount][nBytesFeeAmount];
+    signal input authInfo_fee_amount_denom[nAmount][nBytesFeeDenom];
+    signal input authInfo_fee_amount_amount[nAmount][nBytesFeeAmount];
     signal output out[nAmount * nBytesAmountMarshal];
     signal output length;
 
@@ -17,7 +19,7 @@ template AmountArrayEncode(nAmount, nBytesFeeDenom, nBytesFeeAmount) {
 
     component ae[nAmount];
     for(i = 0; i < nAmount; i++) {
-        ae = AmountEncode(nBytesFeeDenom, nBytesFeeAmount);
+        ae[i] = AmountEncode();
         for(j = 0; j < nBytesFeeDenom; j++) {
             ae[i].authInfo_fee_amount_denom[j] <== authInfo_fee_amount_denom[i][j];
         }
@@ -41,16 +43,18 @@ template AmountArrayEncode(nAmount, nBytesFeeDenom, nBytesFeeAmount) {
     length <== pbaot.length;
 }
 
-template AmountEncode(nBytesFeeDenom, nBytesFeeAmount) {
+template AmountEncode() {
     var prefixFeeAmount = 0x12;
     var prefixFeeDenom = 0xa;
     var prefixAmount = 0xa;
 
-    var nBytesAmount = getLengthAmount(nBytesFeeDenom, nBytesFeeAmount);
-    var nBytesFeeAmountMarshal = getLengthStringMarshal(nBytesFeeAmount);
+    var nBytesFeeDenom = getLengthFeeDenom();
+    var nBytesFeeAmount = getLengthFeeAmount();
+    var nBytesAmount = getLengthAmount();
+    var nBytesFeeAmountMarshal = getLengthStringMarshal(nBytesAmount);
 
-    signal authInfo_fee_amount_denom[nBytesFeeDenom];
-    signal authInfo_fee_amount_amount[nBytesFeeAmount];
+    signal input authInfo_fee_amount_denom[nBytesFeeDenom];
+    signal input authInfo_fee_amount_amount[nBytesFeeAmount];
 
     signal output out[nBytesFeeAmountMarshal];
     signal output length;
@@ -81,11 +85,19 @@ template AmountEncode(nBytesFeeDenom, nBytesFeeAmount) {
 
 }
 
-function getLengthAmount(nBytesFeeDenom, nBytesFeeAmount) {
-    return getLengthStringMarshal(nBytesFeeDenom) + getLengthStringMarshal(nBytesFeeAmount);
+function getLengthAmount() {
+    return getLengthStringMarshal(getLengthFeeDenom()) + getLengthStringMarshal(getLengthFeeAmount());
 }
 
-function getLengthAmountMarshal(nBytesFeeDenom, nBytesFeeAmount) {
-    var nBytesFeeAmount = getLengthAmount(nBytesFeeDenom, nBytesFeeAmount);
-    return getLengthStringMarshal(nBytesFeeAmount);
+function getLengthAmountMarshal() {
+    var nBytesAmount = getLengthAmount();
+    return getLengthStringMarshal(nBytesAmount);
+}
+
+function getLengthFeeDenom() {
+    return 4;
+}
+
+function getLengthFeeAmount() {
+    return 5;
 }
