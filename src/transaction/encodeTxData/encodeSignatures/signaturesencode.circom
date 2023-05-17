@@ -4,8 +4,10 @@ include "../../../libs/utils/string.circom";
 include "../../../libs/utils/convert.circom";
 include "../../../libs/utils/shiftbytes.circom";
 
-template SignaturesArrayEncode(nSignatures, nBytesSignature) {
-    var nBytesSignatureMarshal = getLengthSigntureMarshal(nBytesSignature);
+template SignaturesArrayEncode() {
+    var nSignatures = getNSignatures();
+    var nBytesSignature = getLengthSignture();
+    var nBytesSignatureMarshal = getLengthSigntureMarshal();
 
     signal input signatures[nSignatures][nBytesSignature];
     signal output out[nSignatures * nBytesSignatureMarshal];
@@ -15,7 +17,7 @@ template SignaturesArrayEncode(nSignatures, nBytesSignature) {
     var j;
     component se[nSignatures];
     for(i = 0; i < nSignatures; i++) {
-        se[i] = SignatureEncode(nBytesSignature);
+        se[i] = SignatureEncode();
         for(j = 0; j < nBytesSignature; j++) {
             se[i].in[j] <== signatures[i][j];
         }
@@ -35,9 +37,11 @@ template SignaturesArrayEncode(nSignatures, nBytesSignature) {
     length <== pbaot.length;
 }
 
-template SignatureEncode(nBytesSignature) {
+template SignatureEncode() {
     var prefixSignature = 0x1a;
-    var nBytesSignatureMarshal = getLengthSigntureMarshal(nBytesSignature);
+
+    var nBytesSignature = getLengthSignture();
+    var nBytesSignatureMarshal = getLengthSigntureMarshal();
 
     signal input in[nBytesSignature];
     signal output out[nBytesSignatureMarshal];
@@ -57,6 +61,18 @@ template SignatureEncode(nBytesSignature) {
     length <== sm.length;
 }
 
-function getLengthSigntureMarshal(nBytesSignature) {
-    return getLengthStringMarshal(nBytesSignature);
+function getNSignatures() {
+    return 1;
+}
+
+function getLengthSignture() {
+    return 64;
+}
+
+function getLengthSigntureMarshal() {
+    return getLengthStringMarshal(getLengthSignture());
+}
+
+function getLengthSignturesMarshal() {
+    return getNSignatures() * getLengthSigntureMarshal();
 }

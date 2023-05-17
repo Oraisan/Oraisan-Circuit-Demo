@@ -4,7 +4,8 @@ include "../../../../../libs/utils/string.circom";
 include "../../../../../libs/utils/convert.circom";
 include "../../../../../libs/utils/shiftbytes.circom";
 
-template AmountArrayEncode(nAmount) {
+template AmountArrayEncode() {
+    var nAmount = getNAmount();
     var nBytesFeeDenom = getLengthFeeDenom();
     var nBytesFeeAmount = getLengthFeeAmount();
     var nBytesAmountMarshal = getLengthAmountMarshal();
@@ -83,6 +84,10 @@ template AmountEncode() {
     }
     length <== sm.length;
 
+}
+
+function getNAmount() {
+    return 1;
 }
 
 function getLengthAmount() {

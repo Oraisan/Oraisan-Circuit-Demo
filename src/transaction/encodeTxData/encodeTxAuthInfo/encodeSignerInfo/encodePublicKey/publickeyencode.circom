@@ -4,11 +4,14 @@ include "../../../../../libs/utils/string.circom";
 include "../../../../../libs/utils/convert.circom";
 include "../../../../../libs/utils/shiftbytes.circom";
 
-template PublicKeyEncode(nBytesPublicKeyType, nBytesKey) {
+template PublicKeyEncode() {
     var prefixPublicKey = 0xa;
 
-    var nBytesPublicKeyTypeMarshal = getLengthPublicKeyTypeMarshal(nBytesPublicKeyType);
-    var nBytesPublicKeyValueMarshal = getLengthPublicKeyValueMarshal(nBytesKey);
+    var nBytesPublicKeyType = getLengthPublicKeyType();
+    var nBytesKey = getLengthKey();
+
+    var nBytesPublicKeyTypeMarshal = getLengthPublicKeyTypeMarshal();
+    var nBytesPublicKeyValueMarshal = getLengthPublicKeyValueMarshal();
     var nBytesPublicKey = nBytesPublicKeyTypeMarshal + nBytesPublicKeyValueMarshal;
     var nBytesPublicKeyMarshal = getLengthStringMarshal(nBytesPublicKey);
 
@@ -20,12 +23,12 @@ template PublicKeyEncode(nBytesPublicKeyType, nBytesKey) {
 
     var i;
 
-    component pktue = PublicKeyTypeUrlEncode(nBytesPublicKeyType);
+    component pktue = PublicKeyTypeUrlEncode();
     for(i = 0; i < nBytesPublicKeyType; i++) {
         pktue.in[i] <== authInfo_signerInfos_publicKey_type[i];
     }
 
-    component pkve = PublicKeyValueEncode(nBytesKey);
+    component pkve = PublicKeyValueEncode();
     for(i = 0; i < nBytesKey; i++) {
         pkve.in[i] <== authInfo_signerInfos_publicKey_key[i];
     }
@@ -52,12 +55,13 @@ template PublicKeyEncode(nBytesPublicKeyType, nBytesKey) {
     length <== sm.length;
 }
 
-template PublicKeyValueEncode(nBytes) {
+template PublicKeyValueEncode() {
     var prefixKey = 0xa;
     var prefixValue = 0x12;
 
-    var nBytesKeyMarshal = getLengthKeyMarshal(nBytes);
-    var nBytesPublicKeyValueMarshal = getLengthPublicKeyValueMarshal(nBytes);
+    var nBytes = getLengthKey();
+    var nBytesKeyMarshal = getLengthKeyMarshal();
+    var nBytesPublicKeyValueMarshal = getLengthPublicKeyValueMarshal();
 
     signal input in[nBytes];
     
@@ -84,10 +88,11 @@ template PublicKeyValueEncode(nBytes) {
     length <== smValue.length;
 }
 
-template PublicKeyTypeUrlEncode(nBytes) {
+template PublicKeyTypeUrlEncode() {
     var prefixType = 0xa;
 
-    var nBytesPublicKeyTypeMarshal = getLengthPublicKeyTypeMarshal(nBytes);
+    var nBytes = getLengthPublicKeyType();
+    var nBytesPublicKeyTypeMarshal = getLengthPublicKeyTypeMarshal();
 
     signal input in[nBytes];
 
@@ -109,22 +114,30 @@ template PublicKeyTypeUrlEncode(nBytes) {
     length <== sm.length;
 }
 
-function getLengthPublicKeyTypeMarshal(nBytesPublicKeyType) {
-    return getLengthStringMarshal(nBytesPublicKeyType);
+function getLengthPublicKeyType() {
+    return 31;
 }
 
-function getLengthKeyMarshal(nBytesPublicKey) {
-    return getLengthStringMarshal(nBytesPublicKey);
+function getLengthKey() {
+    return 33;
 }
 
-function getLengthPublicKeyValueMarshal(nBytesPublicKey) {
-    return getLengthStringMarshal(getLengthStringMarshal(nBytesPublicKey));
+function getLengthPublicKeyTypeMarshal() {
+    return getLengthStringMarshal(getLengthPublicKeyType());
 }
 
-function getLengthPublicKey(nBytesPublicKeyType, nBytesPublicKey) {
-    return getLengthPublicKeyTypeMarshal(nBytesPublicKeyType) + getLengthPublicKeyValueMarshal(nBytesPublicKey);
+function getLengthKeyMarshal() {
+    return getLengthStringMarshal(getLengthKey());
 }
 
-function getLengthPublicKeyMarshal(nBytesPublicKeyType, nBytesPublicKey) {
-    return getLengthStringMarshal(getLengthPublicKey(nBytesPublicKeyType, nBytesPublicKey));
+function getLengthPublicKeyValueMarshal() {
+    return getLengthStringMarshal(getLengthKeyMarshal());
+}
+
+function getLengthPublicKey() {
+    return getLengthPublicKeyTypeMarshal() + getLengthPublicKeyValueMarshal();
+}
+
+function getLengthPublicKeyMarshal() {
+    return getLengthStringMarshal(getLengthPublicKey());
 }

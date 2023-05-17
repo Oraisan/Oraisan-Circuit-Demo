@@ -11,13 +11,18 @@ include "./encodeSignerInfo/encodePublicKey/publickeyencode.circom";
 include "./encodeSignerInfo/encodeSequence/sequenceencode.circom";
 include "./encodeSignerInfo/signerinfoencode.circom";
 
-template AuthInfoEncode(nSignerInfos, nBytesPublicKeyType, nBytesKey, nAmount) {
+template AuthInfoEncode() {
     var prefixAuthInfo = 0x12;
+
+    var nSignerInfos = getNSignerInfos();
+    var nBytesPublicKeyType = getLengthPublicKeyType();
+    var nBytesKey = getLengthKey();
+    var nAmount = getNAmount();
 
     var nBytesFeeDenom = getLengthFeeDenom();
     var nBytesFeeAmount = getLengthFeeAmount();
-    var nBytesSignerInfoMarshal = getLengthSignerInfoMarshal(nBytesPublicKeyType, nBytesKey);
-    var nBytesFeeMarshal = getLengthFeeMarshal(nAmount);
+    var nBytesSignerInfoMarshal = getLengthSignerInfoMarshal();
+    var nBytesFeeMarshal = getLengthFeeMarshal();
     var nBytesAuthInfo = nBytesSignerInfoMarshal + nBytesFeeMarshal;
     var nBytesAuthInfoMarshal = getLengthStringMarshal(nBytesAuthInfo);
 
@@ -35,7 +40,7 @@ template AuthInfoEncode(nSignerInfos, nBytesPublicKeyType, nBytesKey, nAmount) {
     var i;
     var j;
 
-    component siae = SignerInfosArrayEncode(nSignerInfos, nBytesPublicKeyType, nBytesKey);
+    component siae = SignerInfosArrayEncode();
     for(i = 0; i < nSignerInfos; i++) {
         for(j = 0; j < nBytesPublicKeyType; j++) {
             siae.authInfo_signerInfos_publicKey_type[i][j] <== authInfo_signerInfos_publicKey_type[i][j];
@@ -47,7 +52,7 @@ template AuthInfoEncode(nSignerInfos, nBytesPublicKeyType, nBytesKey, nAmount) {
         siae.authInfo_signerInfos_sequence[i] <== authInfo_signerInfos_sequence[i];
     }
 
-    component fe = FeeEncode(nAmount);
+    component fe = FeeEncode();
     for(i = 0; i < nAmount; i++) {
         for(j = 0; j < nBytesFeeDenom; j++) {
             fe.authInfo_fee_amount_denom[i][j] <== authInfo_fee_amount_denom[i][j];
@@ -79,12 +84,12 @@ template AuthInfoEncode(nSignerInfos, nBytesPublicKeyType, nBytesKey, nAmount) {
     length <== sm.length;
 }
 
-function getLengthAuthInfo(nSignerInfos, nBytesPublicKeyType, nBytesKey, nAmount) {
-    return nSignerInfos * getLengthSignerInfoMarshal(nBytesPublicKeyType, nBytesKey) + getLengthFeeMarshal(nAmount);
+function getLengthAuthInfo() {
+    return getLengthSignerInfosMarshal() + getLengthFeeMarshal();
 }
 
-function getLengthAuthInfoMarshal(nSignerInfos, nBytesPublicKeyType, nBytesKey, nAmount) {
-    return getLengthStringMarshal(getLengthAuthInfo(nSignerInfos, nBytesPublicKeyType, nBytesKey, nAmount));
+function getLengthAuthInfoMarshal() {
+    return getLengthStringMarshal(getLengthAuthInfo());
 }
 
 

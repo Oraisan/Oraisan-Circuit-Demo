@@ -6,9 +6,10 @@ include "../../../../libs/utils/shiftbytes.circom";
 include "./encodeAmount/amountencode.circom";
 include "./encodeGasLimit/gaslimitencode.circom";
 
-template FeeEncode(nAmount) {
+template FeeEncode() {
     var prefixFee = 0x12;
 
+    var nAmount = getNAmount();
     var nBytesFeeDenom = getLengthFeeDenom();
     var nBytesFeeAmount = getLengthFeeAmount();
     var nBytesAmountMarshal = getLengthAmountMarshal();
@@ -26,7 +27,7 @@ template FeeEncode(nAmount) {
 
     var i;
     var j;
-    component aae = AmountArrayEncode(nAmount);
+    component aae = AmountArrayEncode();
     for(i = 0; i < nAmount; i++) {
         for(j = 0; j < nBytesFeeDenom; j++) {
             aae.authInfo_fee_amount_denom[i][j] <== authInfo_fee_amount_denom[i][j];
@@ -61,12 +62,12 @@ template FeeEncode(nAmount) {
     length <== sm.length;
 }
 
-function getLengthFee(nAmount) {
-    return nAmount * getLengthAmountMarshal() + getLengthGasLimitMarshal();
+function getLengthFee() {
+    return getNAmount() * getLengthAmountMarshal() + getLengthGasLimitMarshal();
 }
 
-function getLengthFeeMarshal(nAmount) {
-    return getLengthStringMarshal(getLengthFee(nAmount));
+function getLengthFeeMarshal() {
+    return getLengthStringMarshal(getLengthFee());
 }
 
 

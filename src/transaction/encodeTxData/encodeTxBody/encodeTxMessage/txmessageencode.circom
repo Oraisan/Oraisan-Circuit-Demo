@@ -4,14 +4,19 @@ include "../../../../libs/utils/string.circom";
 include "../../../../libs/utils/convert.circom";
 include "../../../../libs/utils/shiftbytes.circom";
 
-template MessageArrayEncode(nMessage, nBytesMessagesType, nBytesMessagesSender, nBytesMessagesContract, nBytesMessagesMSG) {
+template MessageArrayEncode(nBytesMessagesMSG) {
     
-    var nBytesMessagesMarshal = getLengthMessagesMarshal(nBytesMessagesType, nBytesMessagesSender, nBytesMessagesContract, nBytesMessagesMSG);
+    var nMessage = getNMessages();
+    var nBytesMessagesType = getLengthMessagesType();
+    var nBytesMessagesSender = getLengthMessagesSender();
+    var nBytesMessagesContract = getLengthMessagesContract();
     
-    signal body_messages_type[nMessage][nBytesMessagesType];
-    signal body_messages_sender[nMessage][nBytesMessagesSender];
-    signal body_messages_contract[nMessage][nBytesMessagesContract];
-    signal body_messages_msg[nMessage][nBytesMessagesMSG];
+    var nBytesMessagesMarshal = getLengthMessagesMarshal(nBytesMessagesMSG);
+    
+    signal input body_messages_type[nMessage][nBytesMessagesType];
+    signal input body_messages_sender[nMessage][nBytesMessagesSender];
+    signal input body_messages_contract[nMessage][nBytesMessagesContract];
+    signal input body_messages_msg[nMessage][nBytesMessagesMSG];
 
     signal output out[nMessage * nBytesMessagesMarshal];
     signal output length;
@@ -23,7 +28,7 @@ template MessageArrayEncode(nMessage, nBytesMessagesType, nBytesMessagesSender, 
 
     component eM[nMessage];
     for(i = 0; i < nMessage; i++) {
-        eM[i] = MessageEncode(nBytesMessagesType, nBytesMessagesSender, nMessageContract, nMessageMSG);
+        eM[i] = MessageEncode(nBytesMessagesMSG);
         for(j = 0; j < nBytesMessagesType; j++) {
             eM[i].body_messages_type[j] <== body_messages_type[i][j];
         }
@@ -44,9 +49,9 @@ template MessageArrayEncode(nMessage, nBytesMessagesType, nBytesMessagesSender, 
     component pbaot = PutBytesArrayOnTop(nMessage, nBytesMessagesMarshal);
     for(i = 0; i < nMessage; i++) {
         for(j = 0; j < nBytesMessagesMarshal; j++) {
-            pbot.in[i][j] <== eM[i].out[j];
+            pbaot.in[i][j] <== eM[i].out[j];
         }
-        pbaot.real_length <== eM[i].length;
+        pbaot.real_length[i] <== eM[i].length;
     }
 
     for(i = 0; i < nMessage * nBytesMessagesMarshal; i++) {
@@ -56,19 +61,22 @@ template MessageArrayEncode(nMessage, nBytesMessagesType, nBytesMessagesSender, 
     length <== pbaot.length;
 }
 
-template MessageEncode(nBytesMessagesType, nBytesMessagesSender, nBytesMessagesContract, nBytesMessagesMSG) {
+template MessageEncode(nBytesMessagesMSG) {
     var prefixMessage = 0xa;
 
-    var nBytesMessagesValueMarshal = getLengthMessagesValueMarshal( nBytesMessagesSender, nBytesMessagesContract, nBytesMessagesMSG);
-    var nBytesMessagesTypeMarshal = getLengthMessagesTypeMarshal(nBytesMessagesType);
+    var nBytesMessagesType = getLengthMessagesType();
+    var nBytesMessagesSender = getLengthMessagesSender();
+    var nBytesMessagesContract = getLengthMessagesContract();
+    var nBytesMessagesValueMarshal = getLengthMessagesValueMarshal(nBytesMessagesMSG);
+    var nBytesMessagesTypeMarshal = getLengthMessagesTypeMarshal();
 
     var nBytesMessages = nBytesMessagesValueMarshal + nBytesMessagesTypeMarshal;
     var nBytesMessagesMarshal = getLengthStringMarshal(nBytesMessages);
 
-    signal body_messages_type[nBytesMessagesType];
-    signal body_messages_sender[nBytesMessagesSender];
-    signal body_messages_contract[nBytesMessagesContract];
-    signal body_messages_msg[nBytesMessagesMSG];
+    signal input body_messages_type[nBytesMessagesType];
+    signal input body_messages_sender[nBytesMessagesSender];
+    signal input body_messages_contract[nBytesMessagesContract];
+    signal input body_messages_msg[nBytesMessagesMSG];
 
     //3 = 1 + nMessage_bytes
     signal output out[nBytesMessagesMarshal];
@@ -78,12 +86,12 @@ template MessageEncode(nBytesMessagesType, nBytesMessagesSender, nBytesMessagesC
     var j;
     var cnt = 0;
 
-    component emtu = MessageTypeUrlEncode(nBytesMessagesType);
+    component emtu = MessageTypeUrlEncode();
     for(i = 0; i < nBytesMessagesType; i++) {
-        emtu.in[i] <== body_messages_type;
+        emtu.in[i] <== body_messages_type[i];
     }
 
-    component emv = MessageValueEncode(nBytesMessagesSender, nMessageContract, nMessageMSG);
+    component emv = MessageValueEncode(nBytesMessagesMSG);
     for(i = 0; i < nBytesMessagesSender; i++) {
         emv.body_messages_sender[i] <== body_messages_sender[i];
     }
@@ -117,22 +125,24 @@ template MessageEncode(nBytesMessagesType, nBytesMessagesSender, nBytesMessagesC
     length <== sm.length;
 }
 
-template MessageValueEncode(nBytesMessagesSender, nMessageContract, nBytesMessagesMSG) {
+template MessageValueEncode(nBytesMessagesMSG) {
     var prefixSender = 0xa;
     var prefixContract = 0x12;
     var prefixMSG = 0x1a;
     var prefixValue = 0x12;
 
+    var nBytesMessagesSender = getLengthMessagesSender();
+    var nBytesMessagesContract = getLengthMessagesContract();
     var nBytesMessagesSenderMarshal = getLengthStringMarshal(nBytesMessagesSender);
     var nBytesMessagesContractMarshal = getLengthStringMarshal(nBytesMessagesContract);
     var nBytesMessagesMSGMarshal = getLengthStringMarshal(nBytesMessagesMSG);
 
-    var nBytesMessageValue = nBytesMessagesSenderMarshal + nBytesMessagesContractMarshal + nBytesMessagesMSGMarshal;
-    var nBytesMessagesValueMarshal = getLengthStringMarshal(nBytesMessageValue);
+    var nBytesMessagesValue = nBytesMessagesSenderMarshal + nBytesMessagesContractMarshal + nBytesMessagesMSGMarshal;
+    var nBytesMessagesValueMarshal = getLengthStringMarshal(nBytesMessagesValue);
 
-    signal body_messages_sender[nBytesMessagesSender];
-    signal body_messages_contract[nBytesMessagesContract];
-    signal body_messages_msg[nBytesMessagesMSG];
+    signal input body_messages_sender[nBytesMessagesSender];
+    signal input body_messages_contract[nBytesMessagesContract];
+    signal input body_messages_msg[nBytesMessagesMSG];
 
     // (nBytesMessagesSender + 2 + nBytesMessagesContract + 2 + nBytesMessagesMSG + 1 + max_len_msg_byte + 1 + max_len_value_byte)
     signal output out[nBytesMessagesValueMarshal];
@@ -141,7 +151,7 @@ template MessageValueEncode(nBytesMessagesSender, nMessageContract, nBytesMessag
     var i;
     var j;
 
-    component csm = ConcatStringMarshal(nBytesMessagesSender, nMessageContract);
+    component csm = ConcatStringMarshal(nBytesMessagesSender, nBytesMessagesContract);
     csm.prefix1 <== prefixSender;
     for(i = 0; i < nBytesMessagesSender; i++) {
         csm.s1[i] <== body_messages_sender[i];
@@ -151,9 +161,9 @@ template MessageValueEncode(nBytesMessagesSender, nMessageContract, nBytesMessag
         csm.s2[i] <== body_messages_contract[i];
     }
 
-    component smMSG = StringMarshal(nBodyMessagesMSG);
+    component smMSG = StringMarshal(nBytesMessagesMSG);
     smMSG.prefix <== prefixMSG;
-    for(i = 0; i < nBodyMessagesMSG; i++) {
+    for(i = 0; i < nBytesMessagesMSG; i++) {
         smMSG.in[i] <== body_messages_msg[i];
     }
 
@@ -178,10 +188,11 @@ template MessageValueEncode(nBytesMessagesSender, nMessageContract, nBytesMessag
     length <== smValue.length;
 }
 
-template MessageTypeUrlEncode(nBytes) {
+template MessageTypeUrlEncode() {
     var prefixType = 0xa;
 
-    var nBytesMessagesTypeMarshal = getLengthMessagesTypeMarshal(nBytes);
+    var nBytes = getLengthMessagesType();
+    var nBytesMessagesTypeMarshal = getLengthMessagesTypeMarshal();
 
     signal input in[nBytes];
     signal output out[nBytesMessagesTypeMarshal];
@@ -202,24 +213,41 @@ template MessageTypeUrlEncode(nBytes) {
     length <== sm.length;
 }
 
-function getLengthMessagesValue(nBytesMessagesSender, nBytesMessagesContract, nBytesMessagesMSG) {
-    return getLengthStringMarshal(nBytesMessagesSender) + getLengthStringMarshal(nBytesMessagesContract) + getLengthStringMarshal(nBytesMessagesMSG);
+function getLengthMessagesValue(nBytesMessagesMSG) {
+    return getLengthStringMarshal(getLengthMessagesSender()) + getLengthStringMarshal(getLengthMessagesContract()) + getLengthStringMarshal(nBytesMessagesMSG);
 }
 
-function getLengthMessagesValueMarshal(nBytesMessagesSender, nBytesMessagesContract, nBytesMessagesMSG) {
-    var nBytesValue = getLengthMessagesValue(nBytesMessagesSender, nBytesMessagesContract, nBytesMessagesMSG);
-    return getLengthStringMarshal(nBytesValue)
+function getLengthMessagesValueMarshal(nBytesMessagesMSG) {
+    var nBytesValue = getLengthMessagesValue(nBytesMessagesMSG);
+    return getLengthStringMarshal(nBytesValue);
 }
 
-function getLengthMessagesTypeMarshal(nBytesMessagesType) {
-    return getLengthStringMarshal(nBytesMessagesType);
+function getLengthMessagesTypeMarshal() {
+    return getLengthStringMarshal(getLengthMessagesType());
 }
 
-function getLengthMessages(nBytesMessagesType, nBytesMessagesSender, nBytesMessagesContract, nBytesMessagesMSG) {
-    return getLengthMessagesTypeMarshal(nBytesMessagesType) + getLengthMessagesValueMarshal(nBytesMessagesSender, nBytesMessagesContract, nBytesMessagesMSG); 
+function getLengthMessages(nBytesMessagesMSG) {
+    return getLengthMessagesTypeMarshal() + getLengthMessagesValueMarshal(nBytesMessagesMSG); 
 }
 
-function getLengthMessagesMarshal(nBytesMessagesType, nBytesMessagesSender, nBytesMessagesContract, nBytesMessagesMSG) {
-    var nBytesMessage = getLengthMessages(nBytesMessagesType, nBytesMessagesSender, nBytesMessagesContract, nBytesMessagesMSG); 
+function getLengthMessagesMarshal(nBytesMessagesMSG) {
+    var nBytesMessage = getLengthMessages(nBytesMessagesMSG); 
     return getLengthStringMarshal(nBytesMessage);
+}
+
+function getNMessages() {
+    return 1;
+}
+
+
+function getLengthMessagesType() {
+    return 36;
+}
+
+function getLengthMessagesSender() {
+    return 43;
+}
+
+function getLengthMessagesContract() {
+    return 43;
 }
