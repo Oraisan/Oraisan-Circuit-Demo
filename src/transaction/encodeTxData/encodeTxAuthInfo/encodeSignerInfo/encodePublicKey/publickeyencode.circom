@@ -4,8 +4,26 @@ include "../../../../../libs/utils/string.circom";
 include "../../../../../libs/utils/convert.circom";
 include "../../../../../libs/utils/shiftbytes.circom";
 
+template PublicKeyEncodeDefault() {
+
+    // var nBytesPublicKeyType = getLengthPublicKeyType();
+    var nBytesKey = getLengthKey();
+
+    signal input authInfo_signerInfos_publicKey_key[nBytesKey];
+    signal output out[nBytesKey + 39];
+    signal output length;
+
+    var left_part = [10, 70, 10, 31, 47, 99, 111, 115, 109, 111, 115, 46, 99, 114, 121, 112, 116, 111, 46, 115, 101, 99, 112, 50, 53, 54, 107, 49, 46, 80, 117, 98, 75, 101, 121, 18, 35, 10, 33];
+    for(var i = 0; i < 39; i++){
+        out[i] <== left_part[i];
+    }
+    for(var i = 0; i < nBytesKey; i++) {
+        out[i + 39] <== authInfo_signerInfos_publicKey_key[i];
+    }
+    length <== nBytesKey + 39;
+}   
 template PublicKeyEncode() {
-    var prefixPublicKey = 0xa;
+    var prefixPublicKey = getPrefixPublicKey();
 
     var nBytesPublicKeyType = getLengthPublicKeyType();
     var nBytesKey = getLengthKey();
@@ -56,8 +74,8 @@ template PublicKeyEncode() {
 }
 
 template PublicKeyValueEncode() {
-    var prefixKey = 0xa;
-    var prefixValue = 0x12;
+    var prefixKey = getPrefixKey();
+    var prefixValue = getPrefixValue();
 
     var nBytes = getLengthKey();
     var nBytesKeyMarshal = getLengthKeyMarshal();
@@ -89,7 +107,7 @@ template PublicKeyValueEncode() {
 }
 
 template PublicKeyTypeUrlEncode() {
-    var prefixType = 0xa;
+    var prefixType = getPrefixPublicKeyType();
 
     var nBytes = getLengthPublicKeyType();
     var nBytesPublicKeyTypeMarshal = getLengthPublicKeyTypeMarshal();
@@ -114,8 +132,24 @@ template PublicKeyTypeUrlEncode() {
     length <== sm.length;
 }
 
+function getPrefixPublicKey() {
+    return 0xa;
+}
+
+function getPrefixValue() {
+    return 0x12;
+}
+
+function getPrefixPublicKeyType() {
+    return 0xa;
+}
+
 function getLengthPublicKeyType() {
     return 31;
+}
+
+function getPrefixKey() {
+    return 0xa;
 }
 
 function getLengthKey() {

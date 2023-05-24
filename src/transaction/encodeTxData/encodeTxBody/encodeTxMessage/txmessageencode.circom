@@ -249,5 +249,5 @@ function getLengthMessagesSender() {
 }
 
 function getLengthMessagesContract() {
-    return 43;
+    return 63;
 }

@@ -128,6 +128,64 @@ template TransactionEncode(nBytesMessagesMSG) {
     length <== eb.length + aie.length + sae.length;
 }
 
+template TransactionEncodeDefault(nBytesBodyMarshal) {
+
+    var nBytesAuthInfoMarshal = getLengthAuthInfoMarshal(); //105
+    var nBytesSignatureMarshal = getLengthSignturesMarshal(); //66
+    signal input txBody[nBytesBodyMarshal];
+    signal input txAuthInfos[nBytesAuthInfoMarshal];
+    signal input signatures[nBytesSignatureMarshal];
+
+
+    signal output out[nBytesBodyMarshal + nBytesAuthInfoMarshal + nBytesSignatureMarshal];
+    signal output length;
+
+    var i;
+
+    //max 11 last bytes of auth_infos is 0
+    component lengthLastBytesAuthInfos = Length(12);
+    for(i = 0; i < 12; i++) {
+        lengthLastBytesAuthInfos.in[i] <== txAuthInfos[nBytesAuthInfoMarshal - 12 + i];
+    }
+
+    component pbot1 = PutBytesOnTop(12, nBytesSignatureMarshal);
+    for(i  = 0; i < 12; i++) {
+        pbot1.s1[i] <== txAuthInfos[nBytesAuthInfoMarshal - 12 + i];
+    }
+    pbot1.idx <== lengthLastBytesAuthInfos.out;
+
+    for(i = 0; i < nBytesSignatureMarshal; i++) {
+        pbot1.s2[i] <== signatures[i];
+    }
+    
+    component lengthLastBytesBody = Length(20);
+    for(i = 0; i < 20; i++) {
+        lengthLastBytesBody.in[i] <== txBody[nBytesBodyMarshal - 20];
+    }
+
+    component pbot2 = PutBytesOnTop(20, nBytesAuthInfoMarshal + nBytesSignatureMarshal);
+    for(i = 0; i < 20; i++) {
+        pbot2.s1[i] <== txBody[i];
+    }
+    pbot2.idx <== lengthLastBytesBody.out;
+
+    for(i = 0; i < nBytesAuthInfoMarshal - 12; i++) {
+        pbot2.s2[i] <== txAuthInfos[i];
+    }
+    for(i = 0; i < 12 + nBytesSignatureMarshal; i++) {
+        pbot2.s2[i + nBytesAuthInfoMarshal - 12] <== pbot1.out[i];
+    }
+
+    for(i = 0; i < nBytesBodyMarshal - 20; i++) {
+        out[i] <== txBody[i];
+    }
+    for(i = 0; i < 20 + nBytesAuthInfoMarshal + nBytesSignatureMarshal; i++) {
+        out[i + nBytesBodyMarshal - 20] <== pbot2.out[i];
+    }
+
+    length <== nBytesBodyMarshal - 20 + lengthLastBytesBody.out + nBytesAuthInfoMarshal - 12 + lengthLastBytesAuthInfos.out + nBytesSignatureMarshal;
+}
 function getLengthTx(nBytesMessagesMSG) {
     return getLengthBodyMarshal(nBytesMessagesMSG) + getLengthAuthInfoMarshal() + getLengthSignturesMarshal();
 }
+

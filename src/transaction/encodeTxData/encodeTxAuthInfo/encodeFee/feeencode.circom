@@ -7,7 +7,7 @@ include "./encodeAmount/amountencode.circom";
 include "./encodeGasLimit/gaslimitencode.circom";
 
 template FeeEncode() {
-    var prefixFee = 0x12;
+    var prefixFee = getPrefixFee();
 
     var nAmount = getNAmount();
     var nBytesFeeDenom = getLengthFeeDenom();
@@ -60,6 +60,10 @@ template FeeEncode() {
         out[i] <== sm.out[i];
     }
     length <== sm.length;
+}
+
+function getPrefixFee() {
+    return 0x12;
 }
 
 function getLengthFee() {

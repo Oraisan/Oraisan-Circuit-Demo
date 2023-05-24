@@ -4,6 +4,23 @@ include "../../../libs/utils/string.circom";
 include "../../../libs/utils/convert.circom";
 include "../../../libs/utils/shiftbytes.circom";
 
+template SignaturesArrayEncodeDefault() {
+    var prefixSignature = getPrefixSignatures();
+
+    var nBytesSignature = getLengthSignture();
+
+    signal input signatures[nBytesSignature];
+    signal output out[nBytesSignature + 2];
+    signal output length;
+
+    out[0] <== prefixSignature;
+    out[1] <== nBytesSignature;
+    for(var i = 0; i < nBytesSignature; i++) {
+        out[i + 2] <== signatures[i];
+    }
+    length <== 2 + nBytesSignature;
+}
+
 template SignaturesArrayEncode() {
     var nSignatures = getNSignatures();
     var nBytesSignature = getLengthSignture();
@@ -38,7 +55,7 @@ template SignaturesArrayEncode() {
 }
 
 template SignatureEncode() {
-    var prefixSignature = 0x1a;
+    var prefixSignature = getPrefixSignatures();
 
     var nBytesSignature = getLengthSignture();
     var nBytesSignatureMarshal = getLengthSigntureMarshal();
@@ -59,6 +76,10 @@ template SignatureEncode() {
         out[i] <== sm.out[i];
     }
     length <== sm.length;
+}
+
+function getPrefixSignatures() {
+    return 0x1a;
 }
 
 function getNSignatures() {
