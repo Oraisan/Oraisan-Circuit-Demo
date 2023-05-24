@@ -96,38 +96,5 @@ template TransactionEncodeVerifier(nBytesMessagesMSG) {
     log(te.length);
 }
 
-template TransactionEncodeDefaultVerifier(nBytesBodyMarshal) {
 
-    var nBytesAuthInfoMarshal = getLengthAuthInfoMarshal(); //109
-    var nBytesSignatureMarshal = getLengthSignturesMarshal(); //66
-
-    signal input txBody[nBytesBodyMarshal];
-    signal input txAuthInfos[nBytesAuthInfoMarshal];
-    signal input signatures[nBytesSignatureMarshal];
-
-    signal input out[nBytesBodyMarshal + nBytesAuthInfoMarshal + nBytesSignatureMarshal];
-
-    var i;
-    var j;
-
-    component te = TransactionEncodeDefault(nBytesBodyMarshal);
-    for(i = 0; i < nBytesBodyMarshal; i++) {
-        te.txBody[i] <== txBody[i];
-    }
-
-    for(i = 0; i < nBytesAuthInfoMarshal; i++) {
-        te.txAuthInfos[i] <== txAuthInfos[i];
-    }
-
-    for(i = 0; i < nBytesSignatureMarshal; i++) {
-        te.signatures[i] <== signatures[i];
-    }
-    
-    for(i = 0; i < nBytesBodyMarshal + nBytesAuthInfoMarshal + nBytesSignatureMarshal; i++) {
-        log(i, te.out[i]);
-        te.out[i] === out[i];
-    }
-    log(te.length);
-}
-
-component main = TransactionEncodeDefaultVerifier(922);
+component main = TransactionEncodeVerifier(124);

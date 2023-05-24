@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
-include "../encodetx.circom";
 
-template TransactionEncodeVerifier(nBytesMessagesMSG) {
+include "./encodeTxData/encodetx.circom";
+include "../../sha/sha256prepared.circom";
+
+template CalcuteTransactionHash(nBytesMessagesMSG) {
+
     var nMessage = getNMessages();
     var nBytesMessagesType = getLengthMessagesType();
     var nBytesMessagesSender = getLengthMessagesSender();
     var nBytesMessagesContract = getLengthMessagesContract();
-    var nBytesBodyMarshal = getLengthBodyMarshal(nBytesMessagesMSG);
-
+    
     var nAmount = getNAmount();
     var nBytesFeeDenom = getLengthFeeDenom();
     var nBytesFeeAmount = getLengthFeeAmount();
@@ -17,19 +19,19 @@ template TransactionEncodeVerifier(nBytesMessagesMSG) {
     var nBytesPublicKeyType = getLengthPublicKeyType();
     var nBytesKey = getLengthKey();
 
-    var nBytesAuthInfoMarshal = getLengthAuthInfoMarshal();
-
-    
     var nSignatures = getNSignatures();
     var nBytesSignature = getLengthSignture();
-    var nBytesSignatureMarshal = getLengthSignturesMarshal();
 
-    var nBytesTx = nBytesBodyMarshal + nBytesAuthInfoMarshal + nBytesSignatureMarshal;
+    var nBytesTx = getLengthTx(nBytesMessagesMSG);
 
     signal input body_messages_type[nMessage][nBytesMessagesType];
     signal input body_messages_sender[nMessage][nBytesMessagesSender];
     signal input body_messages_contract[nMessage][nBytesMessagesContract];
     signal input body_messages_msg[nMessage][nBytesMessagesMSG];
+    // signal input body_memo;
+    // signal input body_timeoutHeight;
+    // signal input body_extensionOptions[nExtensionOptions];
+    // signal input body_nonCriticalExtensionOptions[nNonCriticalExtensionOptions];
 
     signal input authInfo_signerInfos_publicKey_type[nSignerInfos][nBytesPublicKeyType];
     signal input authInfo_signerInfos_publicKey_key[nSignerInfos][nBytesKey];
@@ -40,8 +42,8 @@ template TransactionEncodeVerifier(nBytesMessagesMSG) {
     signal input authInfo_fee_gasLimit;
 
     signal input signatures[nSignatures][nBytesSignature];
-    
-    signal input out[nBytesTx];
+
+    signal output out[32];
 
     var i;
     var j;
@@ -88,46 +90,14 @@ template TransactionEncodeVerifier(nBytesMessagesMSG) {
             te.signatures[i][j] <== signatures[i][j];
         }
     }
-    
+
+    component hash = SHA256Message(nBytesTx);
     for(i = 0; i < nBytesTx; i++) {
-        te.out[i] === out[i];
-        log(i, te.out[i]);
+        hash.in[i] <== te.out[i];
     }
-    log(te.length);
+    hash.length <== te.length;
+
+    for(i = 0; i < 32; i++) {
+        out[i] <== hash.out[i];
+    }
 }
-
-template TransactionEncodeDefaultVerifier(nBytesBodyMarshal) {
-
-    var nBytesAuthInfoMarshal = getLengthAuthInfoMarshal(); //109
-    var nBytesSignatureMarshal = getLengthSignturesMarshal(); //66
-
-    signal input txBody[nBytesBodyMarshal];
-    signal input txAuthInfos[nBytesAuthInfoMarshal];
-    signal input signatures[nBytesSignatureMarshal];
-
-    signal input out[nBytesBodyMarshal + nBytesAuthInfoMarshal + nBytesSignatureMarshal];
-
-    var i;
-    var j;
-
-    component te = TransactionEncodeDefault(nBytesBodyMarshal);
-    for(i = 0; i < nBytesBodyMarshal; i++) {
-        te.txBody[i] <== txBody[i];
-    }
-
-    for(i = 0; i < nBytesAuthInfoMarshal; i++) {
-        te.txAuthInfos[i] <== txAuthInfos[i];
-    }
-
-    for(i = 0; i < nBytesSignatureMarshal; i++) {
-        te.signatures[i] <== signatures[i];
-    }
-    
-    for(i = 0; i < nBytesBodyMarshal + nBytesAuthInfoMarshal + nBytesSignatureMarshal; i++) {
-        log(i, te.out[i]);
-        te.out[i] === out[i];
-    }
-    log(te.length);
-}
-
-component main = TransactionEncodeDefaultVerifier(922);

@@ -24,4 +24,4 @@ template VerifyBatchTransaction(nTransaction, nSiblings) {
     }
     newRoot === r.newRoot;
 }
-component main{public[key, newValue, oldRoot, newRoot]} = VerifyBatchTransaction(5, 32);
+component main{public[key, newValue, oldRoot, newRoot]} = VerifyBatchTransaction(4, 32);
