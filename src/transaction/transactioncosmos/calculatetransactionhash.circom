@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
 
-include "./encodeTxData/encodetx.circom";
-include "../../sha/sha256prepared.circom";
+include "./txData/encodetx.circom";
+include "../../libs/sha/sha256prepared.circom";
+include "../../../node_modules/circomlib/circuits/comparators.circom";
+include "../../../node_modules/circomlib/circuits/switcher.circom";
 
 template CalcuteTransactionHash(nBytesMessagesMSG) {
 
@@ -99,5 +101,77 @@ template CalcuteTransactionHash(nBytesMessagesMSG) {
 
     for(i = 0; i < 32; i++) {
         out[i] <== hash.out[i];
+    }
+}
+
+template CalcuteTransactionDefaultHash(nBytesBodyMarshal) {
+    var nBytesAuthInfoMarshal = getLengthAuthInfoMarshal(); //109
+    var nBytesSignatureMarshal = getLengthSignturesMarshal(); //66
+    var nBytesTx = nBytesBodyMarshal + nBytesAuthInfoMarshal + nBytesSignatureMarshal;
+    signal input txBody[nBytesBodyMarshal];
+    signal input txAuthInfos[nBytesAuthInfoMarshal];
+    signal input signatures[nBytesSignatureMarshal];
+
+    signal output out[32];
+    var i;
+    var j;
+    var k = 0;
+
+    component te = TransactionEncodeDefault(nBytesBodyMarshal);
+    for(i = 0; i < nBytesBodyMarshal; i++) {
+        te.txBody[i] <== txBody[i];
+    }
+
+    for(i = 0; i < nBytesAuthInfoMarshal; i++) {
+        te.txAuthInfos[i] <== txAuthInfos[i];
+    }
+
+    for(i = 0; i < nBytesSignatureMarshal; i++) {
+        te.signatures[i] <== signatures[i];
+    }
+
+    component hash1 = SHA256Message(nBytesTx);
+    for(i = 0; i < nBytesTx; i++) {
+        // log(i, te.out[i]);
+        hash1.in[i] <== te.out[i];
+    }
+    hash1.length <== te.length;
+
+    // for(i = nBytesTx - 1; i > 1079; i = i - 1) {
+    //     k += te.out[i];
+    //     // log(i, k, te.out[i]);
+    // }
+
+    // // log("length", te.length);
+    // component iz = IsZero();
+    // iz.in <== k;
+
+    // component sLength = Switcher();
+    // sLength.sel <== iz.out;
+    // sLength.L <== 1079;
+    // sLength.R <== te.length;
+
+    // // log(k, iz.out, sLength.outL);
+    // component hash2 = SHA256Message(1079);
+    // for(i = 0; i < 1079; i++) {
+    //     hash2.in[i] <== te.out[i];
+    // }
+    // hash2.length <== sLength.outL;
+    // // log(sLength.outL);
+    // component sHash[32];
+    // for(i = 0; i < 32; i++) {
+    //     sHash[i] = Switcher();
+    //     sHash[i].sel <== iz.out;
+    //     sHash[i].L <== hash1.out[i];
+    //     sHash[i].R <== hash2.out[i];
+    //     log(i, hash1.out[i], hash2.out[i]);
+    // }
+    // log("length", te.length);
+    // for(i = 0; i < 32; i++) {
+    //     out[i] <== sHash[i].outL;
+    // }
+
+    for(i = 0; i < 32; i++) {
+        out[i] <== hash1.out[i];
     }
 }

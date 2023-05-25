@@ -73,7 +73,7 @@ template PutBytesOnTop(nBytes1, nBytes2) {
     component sw[nBytes1 + nBytes2];
 
     for(i = 0; i < nBytes1; i++) {
-        flags[i] = LessEqThan(10);
+        flags[i] = LessEqThan(12);
         flags[i].in[0] <== idx;
         flags[i].in[1] <== i; 
 
@@ -86,7 +86,7 @@ template PutBytesOnTop(nBytes1, nBytes2) {
     }
 
     for(i = nBytes1; i < nBytes1 + nBytes2; i++) {
-        flags[i] = LessEqThan(10);
+        flags[i] = LessEqThan(12);
         flags[i].in[0] <== i; 
         flags[i].in[1] <== nBytes2 + idx;
 

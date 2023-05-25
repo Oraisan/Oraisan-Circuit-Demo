@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
-include "../../../../../libs/utils/string.circom";
-include "../../../../../libs/utils/convert.circom";
-include "../../../../../libs/utils/shiftbytes.circom";
+include "../../../../../../libs/utils/string.circom";
+include "../../../../../../libs/utils/convert.circom";
+include "../../../../../../libs/utils/shiftbytes.circom";
 
 template SequenceEncode() {
     var prefixSequence = 0x18;

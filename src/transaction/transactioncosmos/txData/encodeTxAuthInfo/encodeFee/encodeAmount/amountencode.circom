@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
-include "../../../../../libs/utils/string.circom";
-include "../../../../../libs/utils/convert.circom";
-include "../../../../../libs/utils/shiftbytes.circom";
+include "../../../../../../libs/utils/string.circom";
+include "../../../../../../libs/utils/convert.circom";
+include "../../../../../../libs/utils/shiftbytes.circom";
+
 
 template AmountArrayEncode() {
     var nAmount = getNAmount();
@@ -45,9 +46,9 @@ template AmountArrayEncode() {
 }
 
 template AmountEncode() {
-    var prefixFeeAmount = 0x12;
-    var prefixFeeDenom = 0xa;
-    var prefixAmount = 0xa;
+    var prefixFeeAmount = getPrefixFeeAmount();
+    var prefixFeeDenom = getPrefixFeeDenom();
+    var prefixAmount = getPrefixAmount();
 
     var nBytesFeeDenom = getLengthFeeDenom();
     var nBytesFeeAmount = getLengthFeeAmount();
@@ -86,6 +87,10 @@ template AmountEncode() {
 
 }
 
+function getPrefixAmount() {
+    return 0xa;
+}
+
 function getNAmount() {
     return 1;
 }
@@ -98,6 +103,31 @@ function getLengthAmountMarshal() {
     var nBytesAmount = getLengthAmount();
     return getLengthStringMarshal(nBytesAmount);
 }
+
+function getPrefixFeeAmount() {
+    return 0x12;
+}
+
+function getPrefixFeeDenom() {
+    return 0xa;
+}
+
+// function getDefaultDenomMarshal() {
+//     var denom_default = getDefaultDenom();
+//     var len = denom_default.length;
+//     var denom_marshal_default[2 + len];
+//     denom_marshal_default[0] = getPrefixFeeDenom();
+//     denom_marshal_default[1] = len;
+//     for(var i = 0; i < len; i++) {
+//         denom_marshal_default[i + 2] = denom_default[i];
+//     }
+//     return denom_marshal_default;
+// }
+
+// function getDefaultDenom() {
+//     var authInfo_fee_amount_denom = [111, 114, 97, 105, 18];
+//     return authInfo_fee_amount_denom;
+// }
 
 function getLengthFeeDenom() {
     return 4;

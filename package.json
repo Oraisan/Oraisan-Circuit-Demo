@@ -6,13 +6,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "snarkjs powersoftau new bn128 22 ./ptau/powersOfTau28_hez_final_22.ptau -v",
-    "circom": "circom ./src/block/signature/*.circom --r1cs --wasm",
-    "zkey-signature": "snarkjs g16s ./src/block/signature/*.r1cs ./ptau/powersOfTau28_hez_final_22.ptau ./src/block/signature/circuit_final.zkey",
+    "circom": "circom ./src/transaction/transactioneth/*.circom --r1cs --wasm",
+    "zkey-signature": "snarkjs g16s ./src/transaction/transactioneth/*.r1cs ./ptau/powersOfTau28_hez_final_20.ptau ./src/transaction/transactioneth/circuit_final.zkey",
     "zkey-encode-message": "snarkjs g16s ./test/message/*.r1cs ./ptau/powersOfTau28_hez_final_13.ptau ./test/message/circuit_final.zkey",
-    "verifier-contract": "snarkjs zkesv ./src/block/signature/*.zkey ./src/block/signature/verifier.sol",
-    "gen-proof": "snarkjs g16p ./src/block/signature/circuit_final.zkey ./src/block/signature/witness.wtns ./src/block/signature/proof.json ./src/block/signature/public.json",
-    "gen-proof-rapid": "../rapidsnark/build/prover ./src/block/signature/circuit_final.zkey ./src/block/signature/witness.wtns ./src/block/signature/proof.json ./src/block/signature/public.json",
-    "get-proof-contract": "snarkjs zkey export soliditycalldata ./src/block/signature/public.json ./src/block/signature/proof.json",
+    "verifier-contract": "snarkjs zkesv ./src/transaction/transactioneth/*.zkey ./src/transaction/transactioneth/verifier.sol",
+    "gen-proof": "snarkjs g16p ./src/transaction/transactioneth/circuit_final.zkey ./src/transaction/transactioneth/witness.wtns ./src/transaction/transactioneth/proof.json ./src/transaction/transactioneth/public.json",
+    "gen-proof-rapid": "../rapidsnark/build/prover ./src/transaction/transactioneth/circuit_final.zkey ./src/transaction/transactioneth/witness.wtns ./src/transaction/transactioneth/proof.json ./src/transaction/transactioneth/public.json",
+    "get-proof-contract": "snarkjs zkey export soliditycalldata ./src/transaction/transactioneth/public.json ./src/transaction/transactioneth/proof.json",
     "task": "node ./tasksfile.js"
   },
   "repository": {

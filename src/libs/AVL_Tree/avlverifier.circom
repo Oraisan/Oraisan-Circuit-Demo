@@ -74,7 +74,7 @@ template CalculateRootFromLeafs(nLeafs) {
             out[i] <== in[0][i];
         }
     } else {
-        var k = getSplitPoint(nLeafs);
+        var k = getSplitPointTree(nLeafs);
         left = CalculateRootFromLeafs(k);
         for(i = 0; i < k; i++) {
             for(j = 0; j < 32; j++) {
@@ -101,7 +101,7 @@ template CalculateRootFromLeafs(nLeafs) {
 
 }
 
-function getSplitPoint(nLeafs) {
+function getSplitPointTree(nLeafs) {
     var i = 1;
     for(i = 1; i * 2 < nLeafs; i *= 2) {
         

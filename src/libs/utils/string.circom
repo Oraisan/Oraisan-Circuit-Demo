@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
+include "../../../node_modules/circomlib/circuits/switcher.circom";
+include "../../../node_modules/circomlib/circuits/comparators.circom";
 
 template Length(nBytes) {
     signal input in[nBytes];
@@ -212,4 +214,77 @@ function getLengthStringMarshal(nBytes) {
     var length = 1 + nSovBytes + nBytes;
     // log("getLengthStringMarshal", nSovBytes, nBytes, length);
     return length;
+}
+
+template ConvertAsciiBytesToNum(nBytes) {
+    assert(nBytes <= 77);
+
+    signal input in[nBytes];
+    signal input length;
+    signal output out;
+
+    var i ;
+    var j = 0;
+    var k = 1;
+    component isGreater[nBytes];
+    component sw[nBytes];
+    component swSum[nBytes];
+    for(i = nBytes - 1; i >= 0; i = i - 1) {
+        isGreater[i] = GreaterEqThan(8);
+        isGreater[i].in[0] <== i;
+        isGreater[i].in[1] <== length;
+
+        swSum[i] = Switcher();
+        swSum[i].sel <== isGreater[i].out;
+        swSum[i].L <== (in[i] - 48) * k;
+        swSum[i].R <== 0;
+
+        j += swSum[i].outL;
+
+        sw[i] = Switcher();
+        sw[i].sel <== isGreater[i].out;
+        sw[i].L <== k * 10;
+        sw[i].R <== k;
+        k = sw[i].outL;
+    }
+
+    out <== j;
+}
+
+template DeleteFromInvalidBytes(nBytes) {
+    signal input in[nBytes];
+    signal output out[nBytes];
+    signal output length;
+    var i;
+    var j = 0;
+    component isNonExist[nBytes];
+
+
+    component checkInvalid[nBytes];
+    checkInvalid[0] = GreaterEqThan(8);
+    checkInvalid[0].in[0] <== in[0];
+    checkInvalid[0].in[1] <== 48;
+
+    isNonExist[0] = IsZero();
+    isNonExist[0].in <== 1 - checkInvalid[0].out;
+
+    for(i = 1; i < nBytes; i++) {
+        checkInvalid[i] = GreaterEqThan(8);
+        checkInvalid[i].in[0] <== in[i];
+        checkInvalid[i].in[1] <== 48;
+
+        isNonExist[i] = IsZero();
+        isNonExist[i].in <== 1 -  isNonExist[i - 1].out * checkInvalid[i].out;
+    }
+
+    component sw[nBytes];
+    for(i = 0; i < nBytes; i++) {
+        sw[i] = Switcher();
+        sw[i].sel <== isNonExist[i].out;
+        sw[i].L <== 48;
+        sw[i].R <== in[i];
+        out[i] <== sw[i].outL;
+        j += isNonExist[i].out;
+    }
+     length <== j;
 }

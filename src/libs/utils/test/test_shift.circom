@@ -64,4 +64,22 @@ template VerifyPutBytesArrayOnTop(nArray, nBytes) {
         pbaot.real_length[i] <== real_length[i];
     }
 }
-component main = VerifyPutBytesArrayOnTop(2, 3);
+
+template VerifyConvertAscii(nBytes) {
+    signal input in[nBytes];
+
+    var i;
+    component dfib = DeleteFromInvalidBytes(nBytes);
+    for(i = 0; i < nBytes; i++) {
+        dfib.in[i] <== in[i];
+    }
+
+    component cabtn = ConvertAsciiBytesToNum(nBytes);
+    for(i = 0; i < nBytes; i++) {
+        cabtn.in[i] <== dfib.out[i];
+    }
+    cabtn.length <== dfib.length;
+
+    log(cabtn.out);
+}
+component main = VerifyConvertAscii(77);

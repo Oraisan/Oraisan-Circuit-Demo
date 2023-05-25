@@ -23,3 +23,23 @@ template CalculateAddress() {
     
     out <== addr.out;
 }
+
+template CalculateAddressBytes(nBytes) {
+    signal input in[nBytes];
+    signal output  out;
+
+    var i;
+
+    component pubkeyHash = Sha256Bytes(nBytes);
+    for(i = 0; i < nBytes; i++) {
+        pubkeyHash.in[i] <== in[i];
+    }
+
+    component addr = BytesToNum(20);
+    for(i = 0; i < 20; i++) {
+        addr.in[i] <== pubkeyHash.out[i];
+    }
+    
+    
+    out <== addr.out;
+}

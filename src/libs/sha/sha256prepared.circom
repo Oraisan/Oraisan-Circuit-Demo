@@ -101,7 +101,7 @@ template SHA256Message(nBytes) {
 
 
     nBlocks = ((nBytes + 8)\64)+1;
-
+    
     component pbot = PutBytesOnTop(nBytes, 1);
     
     for(i = 0; i < nBytes; i++) {

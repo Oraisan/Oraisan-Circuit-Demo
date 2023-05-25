@@ -1,8 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
-include "../../../../../libs/utils/string.circom";
-include "../../../../../libs/utils/convert.circom";
-include "../../../../../libs/utils/shiftbytes.circom";
+include "../../../../../../libs/utils/string.circom";
+include "../../../../../../libs/utils/convert.circom";
+include "../../../../../../libs/utils/shiftbytes.circom";
+
+template ModeInfoEncodeDefault() {
+    signal input in;
+    signal output out[6];
+    signal output length;
+
+    var left_part = [18, 4, 10, 2, 8];
+    for(var i = 0; i < 5; i++) {
+        out[i] <== left_part[i];
+    }
+    out[5] <== in;
+}
 
 template ModeInfoEncode() {
     var prefixModeInfo = 0x12;
@@ -96,5 +108,5 @@ function getLengthModeMarshal() {
 }
 
 function getLengthMode() {
-    return 2;
+    return 1;
 }

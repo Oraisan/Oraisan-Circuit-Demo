@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
-include "../../../libs/utils/string.circom";
-include "../../../libs/utils/convert.circom";
-include "../../../libs/utils/shiftbytes.circom";
+include "../../../../libs/utils/address.circom";
+include "../../../../libs/utils/string.circom";
+include "../../../../libs/utils/convert.circom";
+include "../../../../libs/utils/shiftbytes.circom";
 include "./encodeFee/feeencode.circom";
 include "./encodeFee/encodeAmount/amountencode.circom";
 include "./encodeFee/encodeGasLimit/gaslimitencode.circom";
@@ -82,6 +83,24 @@ template AuthInfoEncode() {
         out[i] <== sm.out[i];
     }
     length <== sm.length;
+}
+
+template ExtractAuthInfos() {
+    var nBytesAuthInfoMarshal = getLengthAuthInfoMarshal();
+    var nBytesKey = getLengthKey();
+
+    var key_start = 6 + getLengthPublicKeyType() + 4;
+
+    signal input in[nBytesAuthInfoMarshal];
+    signal output out;
+
+    var i;
+    
+    component keyAddress = CalculateAddressBytes(nBytesKey);
+    for(i = 0; i < nBytesKey; i++) {
+        keyAddress.in[i] <== in[i + key_start];
+    }
+    out <== keyAddress.out;
 }
 
 function getLengthAuthInfo() {

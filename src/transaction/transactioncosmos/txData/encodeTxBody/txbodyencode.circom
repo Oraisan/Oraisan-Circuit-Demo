@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
-include "../../../libs/utils/string.circom";
+include "../../../../libs/utils/string.circom";
+include "../../../../libs/utils/address.circom";
 include "./encodeTxMessage/txmessageencode.circom";
 
 template EncodeBody(nBytesMessagesMSG) {
@@ -58,6 +59,49 @@ template EncodeBody(nBytesMessagesMSG) {
     }
     length <== sm.length;
 }
+
+template ExtractBody(nBytesBodyMarshal) {
+
+    var nBytesMessagesSender = getLengthMessagesSender();
+    var nBytesMessagesContract = getLengthMessagesContract();
+
+    var sender_start = 8 + getLengthMessagesType() + 5;
+    var contract_start = sender_start + nBytesMessagesSender + 2;
+    var root_deposit_start = contract_start + nBytesMessagesContract + 3 + 32;
+    signal input in[nBytesBodyMarshal];
+    signal output sender;
+    signal output contract;
+    signal output depositRoot;
+
+    var i;
+
+    component sAddress = CalculateAddressBytes(nBytesMessagesSender);
+    for(i = 0; i < nBytesMessagesSender; i++) {
+        sAddress.in[i] <== in[i + sender_start];
+    }
+
+    component sContract = CalculateAddressBytes(nBytesMessagesContract);
+    for(i = 0; i < nBytesMessagesContract; i++) {
+        sContract.in[i] <== in[i + contract_start];
+    }
+
+    component dfib = DeleteFromInvalidBytes(77);
+    for(i = 0; i < 77; i++) {
+        dfib.in[i] <== in[root_deposit_start + i];
+    }
+
+    component cabtn = ConvertAsciiBytesToNum(77);
+    for(i = 0; i < 77; i++) {
+        cabtn.in[i] <== dfib.out[i];
+    }
+    cabtn.length <== dfib.length;
+
+
+    sender <== sAddress.out;
+    contract <== sContract.out;
+    depositRoot <== cabtn.out;
+}
+
 
 function getLengthBody(nBytesMessagesMSG) {
     return getNMessages() * getLengthMessagesMarshal(nBytesMessagesMSG);

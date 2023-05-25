@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
 include "../encodetx.circom";
+include "../../calculatedatahash.circom";
 
 template TransactionEncodeVerifier(nBytesMessagesMSG) {
     var nMessage = getNMessages();
@@ -89,12 +90,85 @@ template TransactionEncodeVerifier(nBytesMessagesMSG) {
         }
     }
     
-    for(i = 0; i < nBytesTx; i++) {
-        te.out[i] === out[i];
-        log(i, te.out[i]);
-    }
-    log(te.length);
+    // for(i = 0; i < nBytesTx; i++) {
+    //     te.out[i] === out[i];
+    //     log(i, te.out[i]);
+    // }
+    // log(te.length);
 }
 
+template TransactionEncodeDefaultVerifier(nBytesBodyMarshal) {
 
-component main = TransactionEncodeVerifier(124);
+    var nBytesAuthInfoMarshal = getLengthAuthInfoMarshal(); //109
+    var nBytesSignatureMarshal = getLengthSignturesMarshal(); //66
+
+    signal input txBody[nBytesBodyMarshal];
+    signal input txAuthInfos[nBytesAuthInfoMarshal];
+    signal input signatures[nBytesSignatureMarshal];
+
+    signal input out[nBytesBodyMarshal + nBytesAuthInfoMarshal + nBytesSignatureMarshal];
+
+    var i;
+    var j;
+
+    component te = TransactionEncodeDefault(nBytesBodyMarshal);
+    for(i = 0; i < nBytesBodyMarshal; i++) {
+        te.txBody[i] <== txBody[i];
+    }
+
+    for(i = 0; i < nBytesAuthInfoMarshal; i++) {
+        te.txAuthInfos[i] <== txAuthInfos[i];
+    }
+
+    for(i = 0; i < nBytesSignatureMarshal; i++) {
+        te.signatures[i] <== signatures[i];
+    }
+    
+    // for(i = 0; i < nBytesBodyMarshal + nBytesAuthInfoMarshal + nBytesSignatureMarshal; i++) {
+    //     log(i, te.out[i]);
+    //     te.out[i] === out[i];
+    // }
+    // log(te.length);
+}
+
+template TestDepositionRootCosmosDefaultVerifier(nSiblings, nBytesBodyMarshal) {
+
+    var nBytesAuthInfoMarshal = getLengthAuthInfoMarshal(); //109
+    var nBytesSignatureMarshal = getLengthSignturesMarshal(); //66
+
+    signal input txBody[nBytesBodyMarshal];
+    signal input txAuthInfos[nBytesAuthInfoMarshal];
+    signal input signatures[nBytesSignatureMarshal];
+
+    signal input key;
+    signal input dataHash[32];
+    signal input siblings[nSiblings][32];
+
+    var i;
+    var j;
+
+    component te = CalculateDataHashFromTxData(nSiblings, nBytesBodyMarshal);
+    for(i = 0; i < nBytesBodyMarshal; i++) {
+        te.txBody[i] <== txBody[i];
+    }
+
+    for(i = 0; i < nBytesAuthInfoMarshal; i++) {
+        te.txAuthInfos[i] <== txAuthInfos[i];
+    }
+
+    for(i = 0; i < nBytesSignatureMarshal; i++) {
+        te.signatures[i] <== signatures[i];
+    }
+    
+    te.key <== key;
+    for(i = 0; i < nSiblings; i++) {
+        for(j = 0; j < 32; j++) {
+            te.siblings[i][j] <== siblings[i][j];
+        }
+    }
+
+    for(i = 0; i < 32; i++) {
+        dataHash[i] === te.out[i];
+    }
+}
+component main = TestDepositionRootCosmosDefaultVerifier(2, 922);

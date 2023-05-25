@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
-include "../../../../libs/utils/string.circom";
-include "../../../../libs/utils/convert.circom";
-include "../../../../libs/utils/shiftbytes.circom";
+include "../../../../../libs/utils/string.circom";
+include "../../../../../libs/utils/convert.circom";
+include "../../../../../libs/utils/shiftbytes.circom";
 include "./encodeAmount/amountencode.circom";
 include "./encodeGasLimit/gaslimitencode.circom";
 
 template FeeEncode() {
-    var prefixFee = 0x12;
+    var prefixFee = getPrefixFee();
 
     var nAmount = getNAmount();
     var nBytesFeeDenom = getLengthFeeDenom();
@@ -60,6 +60,10 @@ template FeeEncode() {
         out[i] <== sm.out[i];
     }
     length <== sm.length;
+}
+
+function getPrefixFee() {
+    return 0x12;
 }
 
 function getLengthFee() {
