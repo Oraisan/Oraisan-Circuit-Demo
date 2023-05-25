@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
-include "../transactioncosmos/txData/encodetx.circom";
-include "../transactioncosmos/txData/encodeTxAuthInfo/txauthinfoencode.circom";
-include "../transactioncosmos/txData/encodeTxBody/txbodyencode.circom";
-include "../transactioncosmos/calculatedatahash.circom";
+
+include "../../../libs/utils/address.circom";
+include "../../transactioncosmos/txData/encodetx.circom";
+include "../../transactioncosmos/txData/encodeTxAuthInfo/txauthinfoencode.circom";
+include "../../transactioncosmos/txData/encodeTxBody/txbodyencode.circom";
+include "../../transactioncosmos/calculatedatahash.circom";
 
 template RootDepositVerifier(nSiblings, nBytesBodyMarshal) {
 
@@ -21,6 +23,7 @@ template RootDepositVerifier(nSiblings, nBytesBodyMarshal) {
     signal output sender;
     signal output contract;
     signal output depositRoot;
+    signal output dataHashAddress;
 
     var i;
     var j;
@@ -50,17 +53,25 @@ template RootDepositVerifier(nSiblings, nBytesBodyMarshal) {
         te.out[i] === dataHash[i];
     }
 
+
+    component da = CalculateAddress();
+    for(i = 0; i < 32; i++) {
+        da.in[i] <== dataHash[i];
+    }
+
     component eb = ExtractBody(nBytesBodyMarshal);
     for(i = 0; i < nBytesBodyMarshal; i++) {
         eb.in[i] <== txBody[i];
     }
 
-    log("sender", eb.sender);
-    log("contract", eb.contract);
-    log("depositRoot", eb.depositRoot);
+    // log("sender", eb.sender);
+    // log("contract", eb.contract);
+    // log("depositRoot", eb.depositRoot);
 
     sender <== eb.sender;
     contract <== eb.contract;
     depositRoot <== eb.depositRoot;
+
+    dataHashAddress <== da.out;
 }
 component main = RootDepositVerifier(2, 922);

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
-include "../../libs/Fixed_Merkle_Tree/fmtverifier.circom";
-include "../../libs/Fixed_Merkle_Tree/fmthash.circom";
+include "../../../libs/Fixed_Merkle_Tree/fmtverifier.circom";
+include "../../../libs/Fixed_Merkle_Tree/fmthash.circom";
 template VerifyBatchTransaction(nSiblings) {
     
     signal input eth_bridge_address;
@@ -31,4 +31,4 @@ template VerifyBatchTransaction(nSiblings) {
     root === r.root;
     
 }
-component main{public[eth_bridge_address, eth_receiver, amount, cosmos_token_address]} = VerifyBatchTransaction(32);
+component main{public[eth_bridge_address, eth_receiver, amount, cosmos_token_address, root]} = VerifyBatchTransaction(32);
