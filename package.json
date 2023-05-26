@@ -5,14 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "snarkjs powersoftau new bn128 22 ./ptau/powersOfTau28_hez_final_20.ptau -v",
-    "circom": "circom ./src/block/validatorSet/validatorsLeft/*.circom --r1cs --wasm",
-    "zkey-signature": "snarkjs g16s ./src/block/validatorSet/validatorsLeft/*.r1cs ./ptau/powersOfTau28_hez_final_20.ptau ./src/block/validatorSet/validatorsLeft/circuit_final.zkey",
-    "zkey-encode-message": "snarkjs g16s ./test/message/*.r1cs ./ptau/powersOfTau28_hez_final_20.ptau ./test/message/circuit_final.zkey",
-    "verifier-contract": "snarkjs zkesv ./src/block/validatorSet/validatorsLeft/*.zkey ./src/block/validatorSet/validatorsLeft/verifier.sol",
-    "gen-proof": "snarkjs g16p ./src/block/validatorSet/validatorsLeft/circuit_final.zkey ./src/block/validatorSet/validatorsLeft/witness.wtns ./src/block/validatorSet/validatorsLeft/proof.json ./src/block/validatorSet/validatorsLeft/public.json",
-    "gen-proof-rapid": "../rapidsnark/build/prover ./src/block/validatorSet/validatorsLeft/circuit_final.zkey ./src/block/validatorSet/validatorsLeft/witness.wtns ./src/block/validatorSet/validatorsLeft/proof.json ./src/block/validatorSet/validatorsLeft/public.json",
-    "get-proof-contract": "snarkjs zkey export soliditycalldata ./src/block/validatorSet/validatorsLeft/public.json ./src/block/validatorSet/validatorsLeft/proof.json",
+    "start": "snarkjs powersoftau new bn128 22 ./ptau/powersOfTau28_hez_final_18.ptau -v",
+    "circom": "circom ./src/transaction/transactioncosmos/verifyRootBatchTxsCosmos/*.circom --r1cs --wasm",
+    "zkey-signature": "snarkjs g16s ./src/transaction/transactioncosmos/verifyRootBatchTxsCosmos/*.r1cs ./ptau/powersOfTau28_hez_final_18.ptau ./src/transaction/transactioncosmos/verifyRootBatchTxsCosmos/circuit_final.zkey",
+    "zkey-encode-message": "snarkjs g16s ./test/message/*.r1cs ./ptau/powersOfTau28_hez_final_18.ptau ./test/message/circuit_final.zkey",
+    "verifier-contract": "snarkjs zkesv ./src/transaction/transactioncosmos/verifyRootBatchTxsCosmos/*.zkey ./src/transaction/transactioncosmos/verifyRootBatchTxsCosmos/verifier.sol",
+    "gen-proof": "snarkjs g16p ./src/transaction/transactioncosmos/verifyRootBatchTxsCosmos/circuit_final.zkey ./src/transaction/transactioncosmos/verifyRootBatchTxsCosmos/witness.wtns ./src/transaction/transactioncosmos/verifyRootBatchTxsCosmos/proof.json ./src/transaction/transactioncosmos/verifyRootBatchTxsCosmos/public.json",
+    "gen-proof-rapid": "../rapidsnark/build/prover ./src/transaction/transactioncosmos/verifyRootBatchTxsCosmos/circuit_final.zkey ./src/transaction/transactioncosmos/verifyRootBatchTxsCosmos/witness.wtns ./src/transaction/transactioncosmos/verifyRootBatchTxsCosmos/proof.json ./src/transaction/transactioncosmos/verifyRootBatchTxsCosmos/public.json",
+    "get-proof-contract": "snarkjs zkey export soliditycalldata ./src/transaction/transactioncosmos/verifyRootBatchTxsCosmos/public.json ./src/transaction/transactioncosmos/verifyRootBatchTxsCosmos/proof.json",
     "task": "node ./tasksfile.js"
   },
   "repository": {

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma circom 2.0.0;
-include "../../libs/transaction/newbatchtransaction.circom";
+include "../../../libs/transaction/newbatchtransaction.circom";
 
 template VerifyBatchTransaction(nTransaction, nSiblings) {
     signal input key[nTransaction];
@@ -24,4 +24,4 @@ template VerifyBatchTransaction(nTransaction, nSiblings) {
     }
     newRoot === r.newRoot;
 }
-component main{public[key, newValue, oldRoot, newRoot]} = VerifyBatchTransaction(4, 32);
+component main{public[key, newValue, oldRoot, newRoot]} = VerifyBatchTransaction(5, 32);

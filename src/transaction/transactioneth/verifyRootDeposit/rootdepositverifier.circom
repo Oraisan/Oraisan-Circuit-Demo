@@ -2,10 +2,10 @@
 pragma circom 2.0.0;
 
 include "../../../libs/utils/address.circom";
-include "../../transactioncosmos/txData/encodetx.circom";
-include "../../transactioncosmos/txData/encodeTxAuthInfo/txauthinfoencode.circom";
-include "../../transactioncosmos/txData/encodeTxBody/txbodyencode.circom";
-include "../../transactioncosmos/calculatedatahash.circom";
+include "../../../libs/transaction/txData/encodetx.circom";
+include "../../../libs/transaction/txData/encodeTxAuthInfo/txauthinfoencode.circom";
+include "../../../libs/transaction/txData/encodeTxBody/txbodyencode.circom";
+include "../../../libs/transaction/calculatedatahash.circom";
 
 template RootDepositVerifier(nSiblings, nBytesBodyMarshal) {
 
