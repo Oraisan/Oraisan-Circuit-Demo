@@ -2,7 +2,7 @@
 pragma circom 2.0.0;
 include "../../../libs/Fixed_Merkle_Tree/fmtverifier.circom";
 include "../../../libs/Fixed_Merkle_Tree/fmthash.circom";
-template VerifyBatchTransaction(nSiblings) {
+template VerifyClaimTransaction(nSiblings) {
     
     signal input eth_bridge_address;
     signal input eth_receiver;
@@ -20,7 +20,6 @@ template VerifyBatchTransaction(nSiblings) {
     h.in[2] <== amount;
     h.in[3] <== cosmos_token_address;
     h.in[4] <== key;
-
     component r = CalculateRootFromSiblings(nSiblings);
     r.key <== key;
     r.in <== h.out;
@@ -31,4 +30,4 @@ template VerifyBatchTransaction(nSiblings) {
     root === r.root;
     
 }
-component main{public[eth_bridge_address, eth_receiver, amount, cosmos_token_address, root]} = VerifyBatchTransaction(32);
+component main{public[eth_bridge_address, eth_receiver, amount, cosmos_token_address, root]} = VerifyClaimTransaction(32);

@@ -3,6 +3,8 @@ pragma circom 2.0.0;
 include "../../../node_modules/circomlib/circuits/switcher.circom";
 include "../../../node_modules/circomlib/circuits/comparators.circom";
 
+//These last bytes has 0 value is not calculated
+//Ex: [1, 2, 3, 0, 5, 6, 0, 0, 0, 0] => length = 6
 template Length(nBytes) {
     signal input in[nBytes];
     signal output out;
