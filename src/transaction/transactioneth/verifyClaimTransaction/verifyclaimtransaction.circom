@@ -30,4 +30,4 @@ template VerifyClaimTransaction(nSiblings) {
     root === r.root;
     
 }
-component main{public[eth_bridge_address, eth_receiver, amount, eth_token_address, root]} = VerifyClaimTransaction(32);
+component main{public[eth_bridge_address, eth_receiver, amount, eth_token_address, key, root]} = VerifyClaimTransaction(32);
