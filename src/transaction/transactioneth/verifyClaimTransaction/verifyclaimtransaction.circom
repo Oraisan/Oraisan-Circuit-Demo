@@ -7,19 +7,19 @@ template VerifyClaimTransaction(nSiblings) {
     signal input eth_bridge_address;
     signal input eth_receiver;
     signal input amount;
-    signal input cosmos_token_address;
+    signal input eth_token_address;
     signal input key;
 
     signal input siblings[nSiblings];
     signal input root;
     var i;
 
-    component h = Hash(5);
+    component h = Hash(4);
     h.in[0] <== eth_bridge_address;
     h.in[1] <== eth_receiver;
     h.in[2] <== amount;
-    h.in[3] <== cosmos_token_address;
-    h.in[4] <== key;
+    h.in[3] <== eth_token_address;
+    
     component r = CalculateRootFromSiblings(nSiblings);
     r.key <== key;
     r.in <== h.out;
@@ -30,4 +30,4 @@ template VerifyClaimTransaction(nSiblings) {
     root === r.root;
     
 }
-component main{public[eth_bridge_address, eth_receiver, amount, cosmos_token_address, root]} = VerifyClaimTransaction(32);
+component main{public[eth_bridge_address, eth_receiver, amount, eth_token_address, root]} = VerifyClaimTransaction(32);

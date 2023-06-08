@@ -42,4 +42,4 @@ template VerifyHashedRoot(nLeafs) {
 
     root  === r.out;
 }
-component main = VerifyHashedRoot(4);
+component main = VerifyRoot(32);

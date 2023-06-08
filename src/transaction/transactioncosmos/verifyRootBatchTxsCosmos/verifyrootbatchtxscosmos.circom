@@ -11,7 +11,7 @@ template VerifyBatchTransaction(nTransaction, nSiblings) {
     var i;
     var j;
 
-    var oldValue = 11730251359286723731141466095709901450170369094578288842486979042586033922425;
+    var oldValue = 19014214495641488759237505126948346942972912379615652741039992445865937985820;
     component r = NewRootBatchTransaction(nTransaction, nSiblings);
     r.oldRoot <== oldRoot;
     for(i = 0; i < nTransaction; i++) {

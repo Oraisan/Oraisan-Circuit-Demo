@@ -1,21 +1,32 @@
 exports.initialize = exports.getTree = exports.numToHex = exports.hash = exports.getSiblings = void 0;
 
 const fs = require("fs");
-const { buildMimc7 } = require("circomlibjs");
+const { buildPoseidon } = require("circomlibjs");
 const { toBufferLE, toBigIntLE, toBigIntBE } = require("bigint-buffer");
 const MerkleTree = require("fixed-merkle-tree");
 const { randomBytes } = require("crypto");
 const BN = require("bn.js");
-let mimc;
+let poseidon;
 let F;
 let tree;
 
+
 const initialize = async () => {
-    mimc = await buildMimc7();
-    F = mimc.F;
-    tree = new MerkleTree(32);
+    poseidon = await buildPoseidon();
+    F = poseidon.F;
+
+    const option = {
+        hashFunction: hashInner,
+        zeroElement: hash([0])
+    }
+    tree = new MerkleTree(32, undefined, option);
 }
 exports.initialize = initialize;
+
+function hashInner(left, right) {
+    // return F.toObject(babyJub.unpackPoint(poseidon.hash(L, R))[0]);
+    return hash([left, right])
+}
 
 const getTree = () => {
     return tree;
@@ -25,14 +36,17 @@ exports.getTree = getTree;
 function numToHex(num) {
     const hexStr = num.toString(16);
     const zeroPaddedHexStr = hexStr.padStart(64, "0"); // pad to 32 bytes (64 characters)
+
     return "0x" + zeroPaddedHexStr;
 }
 
 exports.numToHex = numToHex;
 
 function hash(arr) {
-    // return F.toObject(babyJub.unpackPoint(mimc.hash(L, R))[0]);
-    return F.toObject(mimc.multiHash(arr, 0));
+    // return F.toObject(babyJub.unpackPoint(poseidon.hash(L, R))[0]);
+    const h = F.e(poseidon([...arr]));
+    const res = BigInt("0x" + F.toObject(h).toString('16')).toString()
+    return res;
 }
 exports.hash = hash;
 
@@ -41,10 +55,10 @@ function randomBigInt(n) {
 }
 
 const addLeaf = async (cccd, sex, DoBdate, BirthPlace) => {
-    if (!tree) await initialize();
-    const leaf =  hash([cccd, sex, DoBdate, BirthPlace]);
-    tree.insert(leaf);
-    return tree._layers[0].length - 1;
+    // if (!tree) await initialize();
+    // const leaf =  hash([cccd, sex, DoBdate, BirthPlace]);
+    // tree.insert(leaf);
+    // return tree._layers[0].length - 1;
 }
 exports.addLeaf = addLeaf;
 
@@ -56,39 +70,3 @@ exports.getSiblings = getSiblings;
 /*
 
  */
-const genAgeInput = (publicKey, cccd, sex, DoBdate, BirthPlace, minAge, maxAge, index) => {
-
-    const leaf = hash([cccd, sex, DoBdate, BirthPlace]);
-
-    let dateObj = new Date();
-    let month = dateObj.getUTCMonth() + 1; //months from 1-12
-    let day = dateObj.getUTCDate();
-    let year = dateObj.getUTCFullYear();
-
-
-
-    // console.log(hash(toBufferLE(leaf.publicKey, 20)))
-
-    const { pathElements, pathIndices } = tree.path(index);
-    const input = {
-        root: tree.root(),
-        leaf: numToHex(leaf),
-        publicKey: numToHex(publicKey),
-        CCCD: Number(cccd),
-        sex: Number(sex),
-        DoBdate: Number(DoBdate),
-        BirthPlace: Number(BirthPlace),
-
-        minAge: minAge,
-        maxAge: maxAge,
-        challenge: 100,
-        currentYear: year,
-        currentMonth: month,
-        currentDay: day,
-        pathElements: pathElements.map(e => e.toString()),
-        pathIndices: pathIndices,
-    };
-
-    return input;
-}
-exports.genAgeInput = genAgeInput;

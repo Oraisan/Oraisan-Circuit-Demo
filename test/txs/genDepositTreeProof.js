@@ -1,50 +1,53 @@
 const fs = require("fs");
 const { addLeaf, getTree, initialize, hash, getSiblings } = require("./fmt");
-const { readJSONFilesInFolder, getAddresFromAsciiString } = require("./helper");
+const { readJSONFilesInFolder, getAddresFromAsciiString, saveJsonData } = require("./helper");
 
 const range = (start, stop, step) =>
     Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
-
+const depositTree = require("./depositTree/deposit_tree.json");
 
 const main = async () => {
     await initialize();
     const tree = getTree();
-    let data = readJSONFilesInFolder("test/txs/depositInfo");
+    let data = readJSONFilesInFolder("./test/txs/depositInfo");
+    
+    let n_leafs = depositTree.n_leafs;
+    let nqueue_leafs = depositTree.nqueue_leafs
+    let nmax_leafs_update = 5;
 
-    const oldValue = Array.from({ length: 10 }, () => hash([0]));
-    console.log(data)
-    const newValue = Array.from(data, (data) => hash([data.eth_bridge_address, data.eth_receiver, data.amount, getAddresFromAsciiString(data.cosmos_token_address), data.key]));
-    for (i = data.length; i < 10; i++) {
-        newValue.push(oldValue[i]);
+    const newValue = Array.from(data, (data) => hash([data.eth_bridge_address, data.eth_receiver, data.amount, data.eth_token_address]));
+
+    for (i = nqueue_leafs; i < nmax_leafs_update; i++) {
+        newValue.push(hash([0]));
     }
 
-    const index = 0;
-    console.log("default", tree.root());
+    for (let i = 0; i < n_leafs; i++) {
+        tree.update(i, newValue[i]);
+    }
 
-    for (let i = index; i < index + 5; i++) {
-        tree.update(i, newValue[i - index]);
+    if(n_leafs == 0) {
+        tree.update(0, hash([0]));
     }
 
     const oldRoot = tree.root();
 
     const siblings = [];
-
-    for (let i = index + 5; i < index + 10; i++) {
-        tree.update(i, newValue[i - index]);
+    console.log(newValue);
+    for (let i = n_leafs; i < n_leafs + nmax_leafs_update; i++) {
+        tree.update(i, newValue[i]);
         siblings.push(getSiblings(i));
     }
     const newRoot = tree.root();
 
     const input = {
-        key: range(index + 5, index + 10, 1),
-        newValue: newValue.map(e => e.toString()).slice(5, 10),
+        key: range(n_leafs, n_leafs + nmax_leafs_update, 1),
+        newValue: newValue.map(e => e.toString()).slice(n_leafs, n_leafs +  nmax_leafs_update),
         oldRoot: oldRoot,
         siblings: siblings.map(sib => sib.map(e => e.toString())),
         newRoot: newRoot,
     };
-    // console.log(input);
-    json = JSON.stringify(input, null, 2);
-    console.log(json)
+    
+    saveJsonData("./src/transaction/transactioncosmos/verifyRootBatchTxsCosmos/input.json", input)
 };
 
 main()

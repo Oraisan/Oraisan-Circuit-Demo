@@ -2,6 +2,7 @@
 pragma circom 2.0.0;
 include "../encodetx.circom";
 include "../../calculatedatahash.circom";
+include "../../calculatetransactionhash.circom";
 
 template TransactionEncodeVerifier(nBytesMessagesMSG) {
     var nMessage = getNMessages();
@@ -124,11 +125,11 @@ template TransactionEncodeDefaultVerifier(nBytesBodyMarshal) {
         te.signatures[i] <== signatures[i];
     }
     
-    // for(i = 0; i < nBytesBodyMarshal + nBytesAuthInfoMarshal + nBytesSignatureMarshal; i++) {
-    //     log(i, te.out[i]);
-    //     te.out[i] === out[i];
-    // }
-    // log(te.length);
+    for(i = 0; i < nBytesBodyMarshal + nBytesAuthInfoMarshal + nBytesSignatureMarshal; i++) {
+        log(i, te.out[i]);
+        te.out[i] === out[i];
+    }
+    log(te.length);
 }
 
 template TestDepositionRootCosmosDefaultVerifier(nSiblings, nBytesBodyMarshal) {
@@ -171,4 +172,30 @@ template TestDepositionRootCosmosDefaultVerifier(nSiblings, nBytesBodyMarshal) {
         dataHash[i] === te.out[i];
     }
 }
-component main = TestDepositionRootCosmosDefaultVerifier(2, 922);
+
+template CalcuteTransactionDefaultHashVerifier(nSiblings) {
+
+    signal input out[32];
+
+    var i;
+    var j;
+
+    component leafs = HashLeaf(32);
+    for(i = 0; i < 32; i++) {
+        leafs.in[i] <== out[i];
+    }
+
+    // component r = CalculateRootFromSiblings(nSiblings);
+    // for(j = 0; j < 32; j++) {
+    //     for(i = 0; i < nSiblings; i++) {
+    //         r.siblings[i][j] <== 0;
+    //     }
+    //     r.value[j] <== leafs.out[j];
+    // }
+    // r.key <== 0;
+
+    for(i = 0; i < 32; i++) {
+        log(i, leafs.out[i]);
+    }
+}
+component main = CalcuteTransactionDefaultHashVerifier(2);
