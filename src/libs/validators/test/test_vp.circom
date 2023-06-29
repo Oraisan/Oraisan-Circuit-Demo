@@ -38,8 +38,14 @@ template VerifyValidatorHash() {
     }
     vh.votingPower <== votingPower;
 
+    component hl = HashLeaf(34);
+    hl.in[0] <== 10;
+    hl.in[1] <== 32;
     for(i = 0; i < 32; i++) {
-        validatorhash[i] === vh.out[i];
+        hl.in[i + 2] <== vh.out[i];
+    }
+    for(i = 0; i < 32; i++) {
+        validatorhash[i] === hl.out[i];
     }
 }
 
@@ -182,8 +188,8 @@ template VerifyHashMSG() {
     }
 }
 
-template VerifyAddRH() {
-    signal input msg[111];
+template VerifyAddRH(n) {
+    signal input msg[n];
     signal input length;
 
     signal input pubKeys[32];
@@ -195,8 +201,8 @@ template VerifyAddRH() {
     var i;
     var j;
 
-    // component rMsg[111];
-    // for(i = 0; i < 111; i++){
+    // component rMsg[n];
+    // for(i = 0; i < n; i++){
     //     rMsg[i] = ReverseByte();
     //     rMsg[i].in <== msg[i];
     // }
@@ -213,11 +219,11 @@ template VerifyAddRH() {
     //     rR8[i].in <== R8[i];
     // }
 
-    component cAddRH = CalculateAddRH(111);
-    for(i = 0; i < 111; i++) {
+    component cAddRH = CalculateAddRH(n);
+    for(i = 0; i < n; i++) {
         cAddRH.msg[i] <== msg[i];
     }
-    cAddRH.length <== 111;
+    cAddRH.length <== n;
     
     for(i = 0; i < 32; i++) {
         cAddRH.A[i] <== pubKeys[i];
@@ -231,8 +237,8 @@ template VerifyAddRH() {
         }
     }
 
-    component msg2Bits[111];
-    for(i = 0; i < 111; i++) {
+    component msg2Bits[n];
+    for(i = 0; i < n; i++) {
         msg2Bits[i] = BytesToBits(8);
         msg2Bits[i].in <== msg[i];
     }
@@ -249,8 +255,8 @@ template VerifyAddRH() {
         r8ToBits[i].in <== R8[i];
     }
 
-    component cAddRH1 = CalculateAddRH1(888);
-    for(i = 0; i < 111; i++) {
+    component cAddRH1 = CalculateAddRH1(8*n);
+    for(i = 0; i < n; i++) {
         for(j = 0; j < 8; j++) {
             cAddRH1.msg[i * 8 + j] <== msg2Bits[i].out[j];
         }
@@ -276,4 +282,4 @@ template VerifyAddRH() {
         }
     }
 }
-component main = VerifyAddRH();
+component main = VerifyValidatorHash();

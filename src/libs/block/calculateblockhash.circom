@@ -83,6 +83,7 @@ template CalculateBlockHashFromDataAndVals() {
     for(i = 0; i < 32; i++) {
         validatorsHashLeaf.in[i] <== validatorsHash[i];
     }
+    
 
     component parrent = HashInner(32);
     for(i = 0; i < 32; i++) {
@@ -106,5 +107,4 @@ template CalculateBlockHashFromDataAndVals() {
     for(i = 0; i < 32; i++) {
         blockHash[i] <== root.root[i];
     }
-
 }

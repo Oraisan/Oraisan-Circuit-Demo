@@ -85,7 +85,6 @@ template VerifyBlockHeader() {
         validatorHash.pubkeys[0][j] <== pubKeys[j];
     }
     validatorHash.votingPowers[0] <== votingPowers;
-
     
     // Verify blockHash
     component bh = CalculateBlockHashFromDataAndVals();

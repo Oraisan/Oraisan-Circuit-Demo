@@ -174,4 +174,4 @@ template PointEqual() {
   out <== and2[1].out;
 }
 
-component main{public[msg]} = CalculateAddRH(888);
+component main{public[msg]} = CalculateAddRH(952);
