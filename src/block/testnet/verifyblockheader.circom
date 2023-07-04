@@ -133,4 +133,4 @@ function getNTestnetChainID() {
     return 17;
 }
 
-component main = VerifyBlockHeader();
+component main {public[height]} = VerifyBlockHeader();
