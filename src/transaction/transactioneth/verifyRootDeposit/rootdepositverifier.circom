@@ -54,24 +54,24 @@ template RootDepositVerifier(nSiblings, nBytesBodyMarshal) {
     }
 
 
-    component da = CalculateAddress();
-    for(i = 0; i < 32; i++) {
-        da.in[i] <== dataHash[i];
-    }
+    // component da = CalculateAddress();
+    // for(i = 0; i < 32; i++) {
+    //     da.in[i] <== dataHash[i];
+    // }
 
-    component eb = ExtractBody(nBytesBodyMarshal);
-    for(i = 0; i < nBytesBodyMarshal; i++) {
-        eb.in[i] <== txBody[i];
-    }
+    // component eb = ExtractBody(nBytesBodyMarshal);
+    // for(i = 0; i < nBytesBodyMarshal; i++) {
+    //     eb.in[i] <== txBody[i];
+    // }
 
-    // log("sender", eb.sender);
-    // log("contract", eb.contract);
-    // log("depositRoot", eb.depositRoot);
+    // // log("sender", eb.sender);
+    // // log("contract", eb.contract);
+    // // log("depositRoot", eb.depositRoot);
 
-    sender <== eb.sender;
-    contract <== eb.contract;
-    depositRoot <== eb.depositRoot;
+    // sender <== eb.sender;
+    // contract <== eb.contract;
+    // depositRoot <== eb.depositRoot;
 
-    dataHashAddress <== da.out;
+    // dataHashAddress <== da.out;
 }
 component main = RootDepositVerifier(2, 922);

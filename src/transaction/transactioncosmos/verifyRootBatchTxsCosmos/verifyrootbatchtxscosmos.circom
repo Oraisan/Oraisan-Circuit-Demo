@@ -4,8 +4,8 @@ include "../../../libs/transaction/newbatchtransaction.circom";
 
 template VerifyBatchTransaction(nTransaction, nSiblings) {
     signal input key[nTransaction];
-    signal input newValue[nTransaction];
-    signal input oldRoot;
+    signal input newValue[nTransaction];  
+    signal input oldRoot; 
     signal input siblings[nTransaction][nSiblings];
     signal input newRoot;
     var i;
