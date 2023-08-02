@@ -7,10 +7,11 @@ download powersOfTau28_hez_final_22.ptau from https://github.com/iden3/snarkjs o
 
 then create folder ptau (same level with folder src) and save this ptau file to folder.
 
+
 ```
-cd src/block/signature
+cd src/block/testnet
 circom *.circom --r1cs --wasm
-cd verifySignatures_js
+cd verifyblockheader_js
 
 node generate_witness.js ./*.wasm ../input.json ../witness.wtns
 cd ..
@@ -18,4 +19,4 @@ snarkjs g16s *.r1cs ../../ptau/powersOfTau28_hez_final_22.ptau  circuit_final.zk
 snarkjs g16p circuit_final.zkey witness.wtns proof.json public.
 snarkjs zkey export solidityverifier *.zkey verifier.sol
 ```
-then deploy contract verifier.sol
+
